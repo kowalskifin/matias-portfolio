@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matias Korpisalo — Portfolio World</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#1a1a2e; overflow:hidden; font-family:'Press Start 2P',monospace; }
+  canvas { display:block; image-rendering:pixelated; cursor:none; }
+  #ui {
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,0.85); border:2px solid #555; border-radius:8px;
+    padding:10px 16px; color:#aaa; font-size:8px; text-align:center;
+    pointer-events:none; z-index:10; white-space:nowrap;
+  }
+  #popup {
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    background:rgba(10,10,30,0.95); border:3px solid #f0c020;
+    border-radius:12px; padding:28px 32px; color:#eee;
+    max-width:480px; width:90%; z-index:20; display:none;
+    box-shadow:0 0 40px rgba(240,192,32,0.2);
+    max-height:80vh; overflow-y:auto;
+  }
+  #popup h2 { color:#f0c020; font-size:13px; margin-bottom:12px; line-height:1.5; }
+  #popup h3 { color:#7cb8ff; font-size:10px; margin:12px 0 6px; }
+  #popup p { font-family:sans-serif; font-size:13px; line-height:1.7; color:#ccc; margin-bottom:8px; }
+  #popup .tag { display:inline-block; background:#2a4a6a; color:#7cb8ff; padding:3px 8px; border-radius:4px; font-size:9px; margin:2px; font-family:'Press Start 2P',monospace; }
+  #popup .hobby-tag { background:#2a5a2a; color:#7cda7c; }
+  #popup .contact-tag { background:#5a2a5a; color:#da7cda; }
+  #popup .close-hint { color:#888; font-size:8px; margin-top:16px; text-align:center; }
+  #popup a { color:#7cb8ff; text-decoration:none; font-family:sans-serif; }
+  #popup a:hover { text-decoration:underline; }
+  #overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:15; display:none; }
+  #mobile-controls {
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    z-index:10; display:none;
+  }
+  .d-btn {
+    width:50px; height:50px; background:rgba(255,255,255,0.15);
+    border:2px solid rgba(255,255,255,0.3); border-radius:10px;
+    color:white; font-size:20px; display:flex; align-items:center;
+    justify-content:center; cursor:pointer; user-select:none;
+    -webkit-user-select:none; touch-action:manipulation;
+  }
+  .d-btn:active { background:rgba(255,255,255,0.35); }
+  #mobile-controls .row { display:flex; justify-content:center; gap:4px; margin:2px 0; }
+  #name-tag {
+    position:fixed; top:16px; left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,0.8); border:2px solid #f0c020;
+    border-radius:8px; padding:8px 20px; color:#f0c020;
+    font-size:10px; z-index:10; pointer-events:none;
+  }
+  #welcome {
+    position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(5,5,20,0.82); backdrop-filter:blur(2px);
+    z-index:100;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; text-align:center; padding:20px;
+  }
+  #welcome .title { color:#f0c020; font-size:22px; margin-bottom:16px; line-height:1.6; }
+  #welcome .subtitle { color:#7cb8ff; font-size:10px; margin-bottom:24px; line-height:2; }
+  #welcome .desc { font-family:sans-serif; color:#aaa; font-size:14px; line-height:1.8; max-width:420px; margin-bottom:32px; }
+  #welcome .legend { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; margin-bottom:36px; }
+  #welcome .legend-item { display:flex; align-items:center; gap:8px; font-size:9px; }
+  #welcome .legend-dot { width:12px; height:12px; border-radius:3px; }
+  #welcome .start-btn {
+    background:#f0c020; color:#1a1a2e; border:none; padding:14px 36px;
+    font-family:'Press Start 2P',monospace; font-size:11px; border-radius:8px;
+    cursor:pointer; transition:all 0.2s; box-shadow:0 4px 0 #b89015;
+  }
+  #welcome .start-btn:hover { transform:translateY(-2px); box-shadow:0 6px 0 #b89015; background:#f5cc35; }
+  #welcome .start-btn:active { transform:translateY(2px); box-shadow:0 1px 0 #b89015; }
+  #welcome .controls { color:#666; font-size:8px; margin-top:20px; line-height:2; }
+  #welcome .minifig-preview { margin-bottom:24px; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  #welcome .blink { animation:blink 1.5s infinite; }
+  @media(max-width:768px) {
+    #mobile-controls { display:block !important; }
+    #ui { bottom:120px; font-size:7px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="welcome">
+  <div class="minifig-preview">
+    <svg width="64" height="88" viewBox="0 0 64 88" fill="none">
+      <rect x="16" y="0" width="32" height="10" rx="3" fill="#4a3520"/>
+      <rect x="14" y="8" width="36" height="24" rx="4" fill="#f5c040"/>
+      <rect x="22" y="18" width="6" height="4" rx="2" fill="#222"/>
+      <rect x="36" y="18" width="6" height="4" rx="2" fill="#222"/>
+      <rect x="24" y="26" width="16" height="4" rx="2" fill="#222"/>
+      <rect x="10" y="34" width="44" height="24" rx="2" fill="#1e5aa8"/>
+      <text x="32" y="50" text-anchor="middle" fill="white" font-family="Press Start 2P" font-size="8">PM</text>
+      <rect x="0" y="38" width="12" height="14" rx="2" fill="#f5c040"/>
+      <rect x="52" y="38" width="12" height="14" rx="2" fill="#f5c040"/>
+      <rect x="14" y="58" width="16" height="30" rx="2" fill="#444"/>
+      <rect x="34" y="58" width="16" height="30" rx="2" fill="#444"/>
+    </svg>
+  </div>
+  <div class="title">MATIAS KORPISALO</div>
+  <div class="subtitle">SENIOR PRODUCT MANAGER — HELSINKI, FINLAND</div>
+  <div class="desc">Welcome to my interactive portfolio. Explore my world — walk into offices to see my work experience, and discover hobby areas scattered around the map.</div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#7cb8ff"></div><span style="color:#7cb8ff">WORK</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7cda7c"></div><span style="color:#7cda7c">HOBBIES</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#da7cda"></div><span style="color:#da7cda">CONTACT</span></div>
+  </div>
+  <button class="start-btn" id="start-btn">▶ EXPLORE</button>
+  <div class="controls">ARROW KEYS / WASD TO MOVE<br><span class="blink">WALK INTO HIGHLIGHTED AREAS</span></div>
+</div>
+<div id="ui">ARROW KEYS / WASD to move — walk into highlighted areas to explore</div>
+<div id="overlay" onclick="closePopup()"></div>
+<div id="popup"><div id="popup-content"></div></div>
+<div id="mobile-controls">
+  <div class="row"><div class="d-btn" data-dir="up">▲</div></div>
+  <div class="row">
+    <div class="d-btn" data-dir="left">◄</div>
+    <div class="d-btn" data-dir="down">▼</div>
+    <div class="d-btn" data-dir="right">►</div>
+  </div>
+</div>
+<script>
+let gameStarted=false;
+document.getElementById('start-btn').addEventListener('click',function(){
+  document.getElementById('welcome').style.display='none';
+  gameStarted=true;
+});
+
+const C=document.getElementById('c'), X=C.getContext('2d');
+let W,H,scale;
+const TILE=16, COLS=40, ROWS=30;
+const CAM={x:0,y:0};
+const keys={};
+let popupOpen=false, lastZoneId=null, zoneCooldown=false;
+
+const T={
+  GRASS:0,PATH:1,WATER:2,FLOOR:3,WALL:4,DOOR:5,
+  TREE:6,DESK:7,SIGN:8,MAT:9,FLOWER:10,FENCE:11,
+  BRIDGE:12,SAND:13,TATAMI:14,BOOKSHELF:15,PC:16,STONE:17,MAILBOX:18
+};
+
+const TC={
+  [T.GRASS]:'#3a8a3a',[T.PATH]:'#c8b898',[T.WATER]:'#2266aa',
+  [T.FLOOR]:'#d4c4a0',[T.WALL]:'#6a5a4a',[T.DOOR]:'#c08030',
+  [T.TREE]:'#2a6a2a',[T.DESK]:'#8a7050',[T.SIGN]:'#c08030',
+  [T.MAT]:'#aa3030',[T.FLOWER]:'#da6a90',[T.FENCE]:'#9a8060',
+  [T.BRIDGE]:'#a08050',[T.SAND]:'#e8d8a0',[T.TATAMI]:'#8aaa60',
+  [T.BOOKSHELF]:'#6a4a30',[T.PC]:'#334',[T.STONE]:'#778',[T.MAILBOX]:'#3a8a3a'
+};
+
+const map=Array(ROWS).fill(null).map(()=>Array(COLS).fill(T.GRASS));
+const solid=new Set([T.WALL,T.TREE,T.DESK,T.WATER,T.FENCE,T.BOOKSHELF,T.PC,T.STONE,T.MAILBOX]);
+
+// Zones
+const zones=[];
+function addZone(y,x1,x2,id){ zones.push({y,x1,x2,id}); }
+
+// Beacon data for hovering indicators
+const beacons=[];
+
+function buildMap(){
+  // Main horizontal road
+  for(let x=2;x<38;x++){map[15][x]=T.PATH;map[16][x]=T.PATH;}
+  // Vertical road
+  for(let y=5;y<25;y++){map[y][20]=T.PATH;map[y][21]=T.PATH;}
+  // Side paths
+  for(let y=10;y<15;y++){map[y][8]=T.PATH;map[y][9]=T.PATH;}
+  for(let y=17;y<22;y++){map[y][8]=T.PATH;map[y][9]=T.PATH;}
+  for(let y=10;y<15;y++){map[y][30]=T.PATH;map[y][31]=T.PATH;}
+  for(let y=17;y<22;y++){map[y][30]=T.PATH;map[y][31]=T.PATH;}
+  // Extra path to contact area
+  for(let x=20;x<28;x++){map[26][x]=T.PATH;map[27][x]=T.PATH;}
+
+  // Water pond
+  for(let y=2;y<5;y++) for(let x=34;x<38;x++) map[y][x]=T.WATER;
+  map[2][35]=T.WATER;map[5][35]=T.WATER;map[5][36]=T.WATER;
+  map[3][33]=T.BRIDGE;map[4][33]=T.BRIDGE;
+  for(let x=33;x<39;x++){map[1][x]=T.SAND;map[5][x]=T.SAND;}
+  map[2][33]=T.SAND;map[3][38]=T.SAND;map[4][38]=T.SAND;
+
+  // Trees
+  const trees=[[0,0],[0,5],[0,12],[0,18],[0,25],[0,35],
+    [1,2],[1,10],[1,19],[1,27],
+    [3,0],[3,3],[4,1],[5,5],[6,0],[7,2],
+    [3,14],[3,16],[4,13],[5,17],
+    [24,0],[25,2],[26,1],[27,0],[24,5],[25,6],
+    [24,35],[25,37],[26,36],[27,38],[28,35],
+    [2,24],[3,26],[4,23],[5,27],[6,25],
+    [27,14],[28,16],[27,20],[28,22],[26,25],
+    [8,36],[9,38],[7,37],[10,35],
+    [0,38],[1,38],[0,39],[28,0],[29,0],[29,5],
+    [29,10],[29,15],[29,25],[29,30],[29,35]];
+  trees.forEach(([y,x])=>{if(y<ROWS&&x<COLS)map[y][x]=T.TREE;});
+
+  // Flowers
+  [[1,7],[2,9],[6,3],[5,26],[24,3],[25,10],[3,30],[26,30],[7,14]].forEach(([y,x])=>{
+    if(y<ROWS&&x<COLS)map[y][x]=T.FLOWER;
+  });
+
+  // Stones
+  [[14,3],[17,35],[23,8],[6,33],[13,26]].forEach(([y,x])=>map[y][x]=T.STONE);
+
+  // === BUILDINGS ===
+  buildRoom(7,5,8,6,'aibidia');
+  buildRoom(7,23,8,6,'alicent');
+  buildRoom(18,5,8,6,'nordea');
+  buildRoom(18,23,8,6,'if_insurance');
+
+  // === HOBBY AREAS ===
+  buildDojo(3,7);
+  buildReadingNook(22,33);
+  buildGameDen(22,14);
+  buildWorkshop(8,33);
+
+  // === CONTACT AREA ===
+  buildContact(25,27);
+
+  // Fences around dojo
+  for(let x=13;x<18;x++){map[2][x]=T.FENCE;map[6][x]=T.FENCE;}
+  for(let y=2;y<7;y++){map[y][13]=T.FENCE;map[y][18]=T.FENCE;}
+  map[4][13]=T.GRASS;map[4][18]=T.GRASS;
+}
+
+function buildRoom(sy,sx,w,h,id){
+  for(let y=sy;y<sy+h;y++) for(let x=sx;x<sx+w;x++){
+    if(y===sy||y===sy+h-1||x===sx||x===sx+w-1) map[y][x]=T.WALL;
+    else map[y][x]=T.FLOOR;
+  }
+  const dx=sx+Math.floor(w/2);
+  map[sy+h-1][dx]=T.DOOR;map[sy+h-1][dx+1]=T.DOOR;
+  map[sy+1][sx+1]=T.DESK;map[sy+1][sx+2]=T.PC;
+  map[sy+1][sx+w-2]=T.DESK;map[sy+1][sx+w-3]=T.PC;
+  addZone(sy+h,dx,dx+1,id);
+  beacons.push({x:dx+1,y:sy+h,id,type:'work'});
+}
+
+function buildDojo(sy,sx){
+  for(let y=sy;y<sy+3;y++) for(let x=sx;x<sx+4;x++) map[y][x]=T.TATAMI;
+  map[sy][sx]=T.MAT;map[sy+2][sx+3]=T.MAT;
+  addZone(sy,sx,sx+3,'bjj');
+  beacons.push({x:sx+2,y:sy+1,id:'bjj',type:'hobby'});
+}
+
+function buildReadingNook(sy,sx){
+  for(let y=sy;y<sy+3;y++) for(let x=sx;x<sx+4;x++) map[y][x]=T.FLOOR;
+  map[sy][sx]=T.BOOKSHELF;map[sy][sx+1]=T.BOOKSHELF;map[sy][sx+2]=T.BOOKSHELF;
+  addZone(sy,sx,sx+3,'reading');
+  beacons.push({x:sx+2,y:sy+2,id:'reading',type:'hobby'});
+}
+
+function buildGameDen(sy,sx){
+  for(let y=sy;y<sy+3;y++) for(let x=sx;x<sx+4;x++) map[y][x]=T.FLOOR;
+  map[sy][sx]=T.PC;map[sy][sx+3]=T.PC;map[sy+1][sx+1]=T.DESK;
+  addZone(sy,sx,sx+3,'strategy');
+  beacons.push({x:sx+2,y:sy+2,id:'strategy',type:'hobby'});
+}
+
+function buildWorkshop(sy,sx){
+  for(let y=sy;y<sy+3;y++) for(let x=sx;x<sx+4;x++) map[y][x]=T.FLOOR;
+  map[sy][sx]=T.PC;map[sy][sx+1]=T.DESK;map[sy][sx+2]=T.PC;
+  addZone(sy,sx,sx+3,'tech');
+  beacons.push({x:sx+2,y:sy+2,id:'tech',type:'hobby'});
+}
+
+function buildContact(sy,sx){
+  for(let y=sy;y<sy+3;y++) for(let x=sx;x<sx+4;x++) map[y][x]=T.FLOOR;
+  map[sy][sx+1]=T.MAILBOX;
+  addZone(sy,sx,sx+3,'contact');
+  beacons.push({x:sx+2,y:sy+2,id:'contact',type:'contact'});
+}
+
+const P={x:20,y:16,dir:0,frame:0,frameT:0,moving:false};
+
+const popups={
+  aibidia:{
+    title:'🏢 AIBIDIA',
+    subtitle:'Product Manager — Mar 2025 → Present',
+    body:'Scaling SaaS for enterprise B2B clients. Leading product strategy, discovery & delivery for a core product. Driving analytics (DAU/WAU/MAU), owning GTM launches, and running a senior engineering team.',
+    tags:['Product Strategy','GTM Launches','Analytics','Agile','Enterprise SaaS','Discovery']
+  },
+  alicent:{
+    title:'🚀 ALICENT',
+    subtitle:'Senior Product Manager — Jan 2024 → Feb 2025',
+    body:'Early-stage startup — 0→1 ownership. Launched AI-powered SaaS from concept to MVP as founding PM. Conducted extensive client discovery, owned full product lifecycle, collaborated on AI models & CRM integrations.',
+    tags:['0→1 Build','AI/ML','MVP Launch','Client Discovery','CRM Integration']
+  },
+  nordea:{
+    title:'🏦 NORDEA',
+    subtitle:'Senior Product Manager — Mar 2022 → Feb 2024',
+    body:'Consumer finance & BNPL product leadership. Launched BNPL product exceeding adoption & revenue targets in first 6 months. Introduced A/B testing, built metrics frameworks, coached junior PMs, and developed business cases for product expansion.',
+    tags:['BNPL Launch','A/B Testing','Portfolio Mgmt','Mentoring','Business Cases']
+  },
+  if_insurance:{
+    title:'🛡️ IF INSURANCE',
+    subtitle:'Product Manager, Digital Sales & CX — May 2019 → Jan 2022',
+    body:'Led digital sales & customer experience for a major Nordic insurer. Drove +20% signups, +30% marketing consent, and 10% online sales growth through systematic A/B testing and funnel optimization.',
+    tags:['+20% Signups','+10% Sales','CX Design','Funnel Optimization','A/B Testing']
+  },
+  bjj:{
+    title:'🥋 BRAZILIAN JIU-JITSU',
+    subtitle:'The Gentle Art',
+    body:'Training BJJ — the art of human chess on the mats. Problem-solving with your body, learning patience, and getting comfortable being uncomfortable. The best metaphor for product work there is.',
+    tags:['Discipline','Problem Solving','Resilience'],hobby:true
+  },
+  reading:{
+    title:'📚 READING',
+    subtitle:'Never stop learning',
+    body:'Constantly reading — product management, strategy, psychology, sci-fi, and everything in between. Books shape how I think about building products and leading teams.',
+    tags:['Product Books','Strategy','Psychology','Sci-Fi'],hobby:true
+  },
+  strategy:{
+    title:'🎮 STRATEGY GAMES',
+    subtitle:'Systems thinking playground',
+    body:'Playing strategy games — from grand strategy to tactical puzzles. It\'s how I unwind while still exercising the systems thinking and decision-making muscles that matter in product work.',
+    tags:['Systems Thinking','Decision Making','Optimization'],hobby:true
+  },
+  tech:{
+    title:'🔧 TECH PROJECTS',
+    subtitle:'Building things for fun',
+    body:'Tinkering on personal technical projects — experimenting with new tools, building small apps, exploring AI/ML, and staying hands-on with the technology side. A PM who codes is a PM who understands.',
+    tags:['Side Projects','AI Experiments','Full-Stack','Prototyping'],hobby:true
+  },
+  contact:{
+    title:'📬 CONTACT ME',
+    subtitle:'Let\'s connect!',
+    body:'Want to chat about product, collaborate, or just say hi?<br><br>📧 <a href="mailto:matias.korpisalo@outlook.com">matias.korpisalo@outlook.com</a>',
+    tags:['Open to opportunities','Coffee chats','Collaboration'],contact:true
+  }
+};
+
+function resize(){
+  W=window.innerWidth;H=window.innerHeight;
+  scale=Math.max(2,Math.floor(Math.min(W/(20*TILE),H/(15*TILE))));
+  C.width=W;C.height=H;
+  X.imageSmoothingEnabled=false;
+}
+
+function drawTile(tx,ty,sx,sy){
+  const t=map[ty][tx];
+  let col=TC[t]||'#3a8a3a';
+  if(t===T.GRASS){
+    const v=((tx*7+ty*13)%3);
+    col=v===0?'#3a8a3a':v===1?'#3d8d3d':'#378737';
+  }
+  X.fillStyle=col;
+  X.fillRect(sx,sy,TILE*scale,TILE*scale);
+  const s=scale;
+
+  if(t===T.TREE){
+    X.fillStyle='#5a3a1a';X.fillRect(sx+6*s,sy+10*s,4*s,6*s);
+    X.fillStyle='#2a7a2a';X.fillRect(sx+2*s,sy+2*s,12*s,10*s);
+    X.fillStyle='#35903a';X.fillRect(sx+4*s,sy+1*s,8*s,4*s);
+  } else if(t===T.WATER){
+    const sh=((Date.now()/500+tx+ty)%3)|0;
+    if(sh===0){X.fillStyle='rgba(255,255,255,0.15)';X.fillRect(sx+4*s,sy+6*s,3*s,1*s);}
+    if(sh===1){X.fillStyle='rgba(255,255,255,0.1)';X.fillRect(sx+8*s,sy+3*s,4*s,1*s);}
+  } else if(t===T.DESK){
+    X.fillStyle='#a08060';X.fillRect(sx+1*s,sy+2*s,14*s,12*s);
+    X.fillStyle='#8a6a48';X.fillRect(sx+2*s,sy+13*s,3*s,3*s);X.fillRect(sx+11*s,sy+13*s,3*s,3*s);
+  } else if(t===T.PC){
+    X.fillStyle='#222';X.fillRect(sx+3*s,sy+2*s,10*s,8*s);
+    X.fillStyle='#4488cc';X.fillRect(sx+4*s,sy+3*s,8*s,6*s);
+    X.fillStyle='#333';X.fillRect(sx+6*s,sy+10*s,4*s,2*s);X.fillRect(sx+4*s,sy+12*s,8*s,2*s);
+  } else if(t===T.DOOR){
+    X.fillStyle='#d4a040';X.fillRect(sx+2*s,sy+2*s,12*s,14*s);
+    X.fillStyle='#b08030';X.fillRect(sx+3*s,sy+3*s,4*s,5*s);X.fillRect(sx+9*s,sy+3*s,4*s,5*s);
+  } else if(t===T.MAT){
+    X.fillStyle='#cc3333';X.fillRect(sx+1*s,sy+1*s,14*s,14*s);
+    X.fillStyle='#dd5555';X.fillRect(sx+2*s,sy+2*s,12*s,12*s);
+  } else if(t===T.FLOWER){
+    X.fillStyle='#3a8a3a';X.fillRect(sx,sy,TILE*s,TILE*s);
+    const fc=['#ff6b8a','#ffaa40','#ff5555','#ff80c0'];
+    X.fillStyle=fc[(tx+ty)%4];X.fillRect(sx+6*s,sy+5*s,4*s,4*s);
+    X.fillStyle='#ffee44';X.fillRect(sx+7*s,sy+6*s,2*s,2*s);
+    X.fillStyle='#2a7a2a';X.fillRect(sx+7*s,sy+9*s,2*s,4*s);
+  } else if(t===T.FENCE){
+    X.fillStyle='#3a8a3a';X.fillRect(sx,sy,TILE*s,TILE*s);
+    X.fillStyle='#b09060';X.fillRect(sx+2*s,sy+4*s,2*s,12*s);X.fillRect(sx+12*s,sy+4*s,2*s,12*s);
+    X.fillRect(sx,sy+6*s,16*s,2*s);X.fillRect(sx,sy+12*s,16*s,2*s);
+  } else if(t===T.BOOKSHELF){
+    X.fillStyle='#8a6a40';X.fillRect(sx+1*s,sy+1*s,14*s,14*s);
+    const bc=['#c44','#48a','#4a4','#a84','#84a'];
+    for(let i=0;i<4;i++){X.fillStyle=bc[i%5];X.fillRect(sx+(2+i*3)*s,sy+2*s,2*s,5*s);}
+    for(let i=0;i<4;i++){X.fillStyle=bc[(i+2)%5];X.fillRect(sx+(2+i*3)*s,sy+9*s,2*s,5*s);}
+  } else if(t===T.BRIDGE){
+    X.fillStyle='#b09060';X.fillRect(sx,sy,16*s,16*s);
+    X.fillStyle='#907040';X.fillRect(sx,sy,16*s,2*s);X.fillRect(sx,sy+14*s,16*s,2*s);
+  } else if(t===T.SAND){
+    X.fillStyle=((tx*3+ty*7)%2)?'#e8d8a0':'#e0d098';
+    X.fillRect(sx,sy,TILE*s,TILE*s);
+  } else if(t===T.TATAMI){
+    X.fillStyle='#8aaa60';X.fillRect(sx,sy,16*s,16*s);
+    X.fillStyle='#7a9a50';X.fillRect(sx+7*s,sy,2*s,16*s);X.fillRect(sx,sy+7*s,16*s,2*s);
+  } else if(t===T.STONE){
+    X.fillStyle='#3a8a3a';X.fillRect(sx,sy,16*s,16*s);
+    X.fillStyle='#889';X.fillRect(sx+3*s,sy+4*s,10*s,8*s);
+    X.fillStyle='#99a';X.fillRect(sx+4*s,sy+5*s,8*s,5*s);
+  } else if(t===T.WALL){
+    X.fillStyle='#7a6a5a';X.fillRect(sx,sy,16*s,16*s);
+    X.fillStyle='#6a5a4a';
+    X.fillRect(sx+1*s,sy+1*s,6*s,7*s);X.fillRect(sx+9*s,sy+1*s,6*s,7*s);
+    X.fillRect(sx+1*s,sy+9*s,6*s,6*s);X.fillRect(sx+9*s,sy+9*s,6*s,6*s);
+  } else if(t===T.MAILBOX){
+    X.fillStyle='#3a8a3a';X.fillRect(sx,sy,16*s,16*s);
+    // Post
+    X.fillStyle='#8a7050';X.fillRect(sx+7*s,sy+7*s,3*s,9*s);
+    // Box
+    X.fillStyle='#3366cc';X.fillRect(sx+3*s,sy+2*s,10*s,7*s);
+    X.fillStyle='#4488ee';X.fillRect(sx+4*s,sy+3*s,8*s,5*s);
+    // Mail slot
+    X.fillStyle='#222';X.fillRect(sx+5*s,sy+5*s,6*s,1*s);
+    // Flag
+    X.fillStyle='#dd3333';X.fillRect(sx+13*s,sy+2*s,2*s,4*s);
+  }
+}
+
+// Floating beacons
+function drawBeacons(){
+  const s=scale;
+  const t=Date.now();
+  beacons.forEach(b=>{
+    const sx=(b.x*TILE-CAM.x)*scale;
+    const sy=(b.y*TILE-CAM.y)*scale;
+    if(sx<-100||sx>W+100||sy<-100||sy>H+100) return;
+
+    const hover=Math.sin(t/400+b.x)*4*s;
+    const pulse=(Math.sin(t/300+b.y)*0.15+0.85);
+
+    // Distance to player
+    const dx=P.x-b.x, dy=P.y-b.y;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    const nearby=dist<6;
+
+    // Glow ring on ground
+    const glowR=12*s*pulse;
+    const col=b.type==='work'?'rgba(120,180,255,':'rgba(120,220,120,';
+    const colC=b.type==='contact'?'rgba(220,120,220,':col;
+    X.beginPath();
+    X.arc(sx,sy+8*s,glowR,0,Math.PI*2);
+    X.fillStyle=(b.type==='contact'?colC:col)+(nearby?'0.18)':'0.08)');
+    X.fill();
+
+    // Floating arrow/chevron
+    const arrowY=sy-18*s+hover;
+    const aCol=b.type==='work'?'#7cb8ff':b.type==='contact'?'#da7cda':'#7cda7c';
+    X.globalAlpha=nearby?1:0.5+Math.sin(t/500)*0.2;
+
+    // Down arrow
+    X.fillStyle=aCol;
+    X.beginPath();
+    X.moveTo(sx-5*s,arrowY);
+    X.lineTo(sx+5*s,arrowY);
+    X.lineTo(sx,arrowY+5*s);
+    X.closePath();
+    X.fill();
+
+    // Second smaller arrow
+    X.beginPath();
+    X.moveTo(sx-3*s,arrowY-4*s);
+    X.lineTo(sx+3*s,arrowY-4*s);
+    X.lineTo(sx,arrowY-1*s);
+    X.closePath();
+    X.fill();
+
+    X.globalAlpha=1;
+
+    // Label when nearby
+    if(nearby){
+      const info=popups[b.id];
+      if(info){
+        const label=info.title;
+        X.font=`${3*s}px 'Press Start 2P'`;
+        const tw=X.measureText(label).width;
+        X.fillStyle='rgba(0,0,0,0.8)';
+        X.fillRect(sx-tw/2-4*s,arrowY-16*s,tw+8*s,8*s);
+        X.strokeStyle=aCol;
+        X.lineWidth=1;
+        X.strokeRect(sx-tw/2-4*s,arrowY-16*s,tw+8*s,8*s);
+        X.fillStyle=aCol;
+        X.textAlign='center';
+        X.fillText(label,sx,arrowY-10*s);
+        X.textAlign='left';
+
+        // "Enter" hint
+        X.font=`${2*s}px 'Press Start 2P'`;
+        X.fillStyle='#aaa';
+        X.textAlign='center';
+        X.fillText('WALK CLOSER',sx,arrowY-5*s+16*s+hover);
+        X.textAlign='left';
+      }
+    }
+  });
+}
+
+function drawPlayer(sx,sy){
+  const s=scale;
+  const bob=P.moving?Math.sin(Date.now()/100)*1.5*s:0;
+  const py=sy+bob;
+  X.fillStyle='rgba(0,0,0,0.2)';X.fillRect(sx+2*s,sy+13*s,12*s,3*s);
+  X.fillStyle='#4a3520';X.fillRect(sx+4*s,py+0*s,8*s,3*s);
+  if(P.dir!==3) X.fillRect(sx+4*s,py+1*s,9*s,2*s);
+  X.fillStyle='#f5c040';X.fillRect(sx+4*s,py+2*s,8*s,5*s);
+  if(P.dir===0||P.dir===1||P.dir===2){
+    X.fillStyle='#222';
+    if(P.dir===1){X.fillRect(sx+5*s,py+4*s,2*s,1*s);X.fillRect(sx+9*s,py+4*s,1*s,1*s);}
+    else if(P.dir===2){X.fillRect(sx+6*s,py+4*s,1*s,1*s);X.fillRect(sx+9*s,py+4*s,2*s,1*s);}
+    else{X.fillRect(sx+5*s,py+4*s,2*s,1*s);X.fillRect(sx+9*s,py+4*s,2*s,1*s);}
+    X.fillStyle='#222';X.fillRect(sx+6*s,py+6*s,4*s,1*s);
+  }
+  X.fillStyle='#1e5aa8';X.fillRect(sx+3*s,py+7*s,10*s,5*s);
+  const armSwing=P.moving?Math.sin(Date.now()/100)*2*s:0;
+  X.fillStyle='#f5c040';
+  X.fillRect(sx+1*s,py+(8+armSwing/s)*s,3*s,3*s);
+  X.fillRect(sx+12*s,py+(8-armSwing/s)*s,3*s,3*s);
+  const legSwing=P.moving?Math.sin(Date.now()/100)*1.5:0;
+  X.fillStyle='#444';
+  X.fillRect(sx+4*s,py+12*s,4*s,(3+legSwing)*s);
+  X.fillRect(sx+8*s,py+12*s,4*s,(3-legSwing)*s);
+  // Name tag
+  X.fillStyle='rgba(0,0,0,0.7)';X.fillRect(sx-4*s,py-8*s,24*s,7*s);
+  X.fillStyle='#4f4';X.fillRect(sx-2*s,py-5*s,3*s,3*s);
+  X.fillStyle='#fff';X.font=`${3*s}px 'Press Start 2P'`;
+  X.fillText('Matias',sx+3*s,py-3*s);
+}
+
+const zoneLabels=[
+  {x:9,y:13,text:'AIBIDIA',col:'#7cb8ff'},
+  {x:27,y:13,text:'ALICENT',col:'#ffaa55'},
+  {x:9,y:24,text:'NORDEA',col:'#55ddcc'},
+  {x:27,y:24,text:'IF INS.',col:'#ffee55'},
+  {x:9,y:2,text:'🥋 BJJ',col:'#ff6666'},
+  {x:35,y:25,text:'📚 BOOKS',col:'#aaddff'},
+  {x:16,y:25,text:'🎮 GAMES',col:'#aaffaa'},
+  {x:35,y:11,text:'🔧 TECH',col:'#ffcc66'},
+  {x:29,y:28,text:'📬 CONTACT',col:'#da7cda'},
+];
+
+function drawLabels(){
+  const s=scale;
+  zoneLabels.forEach(l=>{
+    const sx=(l.x*TILE-CAM.x)*scale;
+    const sy=(l.y*TILE-CAM.y)*scale;
+    if(sx>-100*s&&sx<W+100&&sy>-50&&sy<H+50){
+      X.fillStyle='rgba(0,0,0,0.55)';
+      const tw=l.text.length*3.5*s+8*s;
+      X.fillRect(sx-tw/2,sy-3*s,tw,8*s);
+      X.fillStyle=l.col;
+      X.font=`${3*s}px 'Press Start 2P'`;
+      X.textAlign='center';
+      X.fillText(l.text,sx,sy+2*s);
+      X.textAlign='left';
+    }
+  });
+}
+
+function checkZones(){
+  if(zoneCooldown) return;
+  const px=Math.floor(P.x),py=Math.floor(P.y);
+  let inZone=null;
+  for(const z of zones){
+    if(py>=z.y-1&&py<=z.y+1&&px>=z.x1-1&&px<=z.x2+1){inZone=z.id;break;}
+  }
+  if(!inZone){
+    const t=map[py]?.[px];
+    if(t===T.DOOR){
+      for(const z of zones){
+        if(Math.abs(py-z.y)<=2&&px>=z.x1-2&&px<=z.x2+2){inZone=z.id;break;}
+      }
+    }
+  }
+  if(!inZone){lastZoneId=null;return;}
+  if(inZone!==lastZoneId){lastZoneId=inZone;showPopup(inZone);}
+}
+
+function showPopup(id){
+  if(popupOpen) return;
+  const d=popups[id];if(!d) return;
+  popupOpen=true;
+  const tagClass=d.hobby?'tag hobby-tag':d.contact?'tag contact-tag':'tag';
+  let html=`<h2>${d.title}</h2><h3>${d.subtitle}</h3><p>${d.body}</p><div style="margin-top:10px">`;
+  d.tags.forEach(t=>html+=`<span class="${tagClass}">${t}</span>`);
+  html+=`</div><div class="close-hint">Press ESC or click outside to close</div>`;
+  document.getElementById('popup-content').innerHTML=html;
+  document.getElementById('popup').style.display='block';
+  document.getElementById('overlay').style.display='block';
+}
+
+function closePopup(){
+  popupOpen=false;zoneCooldown=true;
+  setTimeout(()=>{zoneCooldown=false;},500);
+  document.getElementById('popup').style.display='none';
+  document.getElementById('overlay').style.display='none';
+}
+
+function canMove(nx,ny){
+  const tx=Math.floor(nx),ty=Math.floor(ny);
+  if(tx<0||tx>=COLS||ty<0||ty>=ROWS) return false;
+  return !solid.has(map[ty][tx]);
+}
+
+function update(dt){
+  if(popupOpen) return;
+  let dx=0,dy=0;
+  if(keys['ArrowLeft']||keys['a']||keys['mleft']){dx=-1;P.dir=1;}
+  if(keys['ArrowRight']||keys['d']||keys['mright']){dx=1;P.dir=2;}
+  if(keys['ArrowUp']||keys['w']||keys['mup']){dy=-1;P.dir=3;}
+  if(keys['ArrowDown']||keys['s']||keys['mdown']){dy=1;P.dir=0;}
+  P.moving=dx!==0||dy!==0;
+  const spd=4*dt;
+  const nx=P.x+dx*spd,ny=P.y+dy*spd;
+  if(dx!==0&&canMove(nx,P.y)) P.x=nx;
+  if(dy!==0&&canMove(P.x,ny)) P.y=ny;
+  if(P.moving) checkZones();
+  const targetCX=P.x*TILE-W/(2*scale)+8;
+  const targetCY=P.y*TILE-H/(2*scale)+8;
+  CAM.x+=(targetCX-CAM.x)*0.1;
+  CAM.y+=(targetCY-CAM.y)*0.1;
+}
+
+function draw(){
+  X.clearRect(0,0,W,H);
+  X.fillStyle='#1a1a2e';X.fillRect(0,0,W,H);
+  const startCol=Math.max(0,Math.floor(CAM.x/TILE)-1);
+  const endCol=Math.min(COLS,Math.ceil((CAM.x+W/scale)/TILE)+1);
+  const startRow=Math.max(0,Math.floor(CAM.y/TILE)-1);
+  const endRow=Math.min(ROWS,Math.ceil((CAM.y+H/scale)/TILE)+1);
+  for(let y=startRow;y<endRow;y++)
+    for(let x=startCol;x<endCol;x++)
+      drawTile(x,y,(x*TILE-CAM.x)*scale,(y*TILE-CAM.y)*scale);
+  drawLabels();
+  drawBeacons();
+  const psx=(P.x*TILE-CAM.x)*scale,psy=(P.y*TILE-CAM.y)*scale;
+  drawPlayer(psx,psy);
+}
+
+let lastT=0;
+function loop(t){
+  const dt=Math.min((t-lastT)/1000,0.05);lastT=t;
+  if(gameStarted) update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+
+document.addEventListener('keydown',e=>{
+  keys[e.key]=true;
+  if(e.key==='Escape') closePopup();
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+});
+document.addEventListener('keyup',e=>keys[e.key]=false);
+document.querySelectorAll('.d-btn').forEach(btn=>{
+  const dir=btn.dataset.dir,k='m'+dir;
+  btn.addEventListener('touchstart',e=>{e.preventDefault();keys[k]=true;});
+  btn.addEventListener('touchend',e=>{e.preventDefault();keys[k]=false;});
+  btn.addEventListener('mousedown',e=>{keys[k]=true;});
+  btn.addEventListener('mouseup',e=>{keys[k]=false;});
+});
+
+window.addEventListener('resize',resize);
+resize();buildMap();requestAnimationFrame(loop);
+</script>
+</body>
+</html>
