@@ -1,92 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script defer src="/_vercel/insights/script.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Matias Korpisalo — Portfolio World</title>
+<script defer src="/_vercel/insights/script.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:#1a1a2e; overflow:hidden; font-family:'Press Start 2P',monospace; }
-  canvas { display:block; image-rendering:pixelated; cursor:none; }
-  #ui {
-    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
-    background:rgba(0,0,0,0.85); border:2px solid #555; border-radius:8px;
-    padding:10px 16px; color:#aaa; font-size:8px; text-align:center;
-    pointer-events:none; z-index:10; white-space:nowrap;
-  }
-  #popup {
-    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-    background:rgba(10,10,30,0.95); border:3px solid #f0c020;
-    border-radius:12px; padding:28px 32px; color:#eee;
-    max-width:480px; width:90%; z-index:20; display:none;
-    box-shadow:0 0 40px rgba(240,192,32,0.2);
-    max-height:80vh; overflow-y:auto;
-  }
-  #popup h2 { color:#f0c020; font-size:13px; margin-bottom:12px; line-height:1.5; }
-  #popup h3 { color:#7cb8ff; font-size:10px; margin:12px 0 6px; }
-  #popup p { font-family:sans-serif; font-size:13px; line-height:1.7; color:#ccc; margin-bottom:8px; }
-  #popup .tag { display:inline-block; background:#2a4a6a; color:#7cb8ff; padding:3px 8px; border-radius:4px; font-size:9px; margin:2px; font-family:'Press Start 2P',monospace; }
-  #popup .hobby-tag { background:#2a5a2a; color:#7cda7c; }
-  #popup .contact-tag { background:#5a2a5a; color:#da7cda; }
-  #popup .close-hint { color:#888; font-size:8px; margin-top:16px; text-align:center; }
-  #popup a { color:#7cb8ff; text-decoration:none; font-family:sans-serif; }
-  #popup a:hover { text-decoration:underline; }
-  #overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:15; display:none; }
-  #mobile-controls {
-    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
-    z-index:10; display:none;
-  }
-  .d-btn {
-    width:50px; height:50px; background:rgba(255,255,255,0.15);
-    border:2px solid rgba(255,255,255,0.3); border-radius:10px;
-    color:white; font-size:20px; display:flex; align-items:center;
-    justify-content:center; cursor:pointer; user-select:none;
-    -webkit-user-select:none; touch-action:manipulation;
-  }
-  .d-btn:active { background:rgba(255,255,255,0.35); }
-  #mobile-controls .row { display:flex; justify-content:center; gap:4px; margin:2px 0; }
-  #name-tag {
-    position:fixed; top:16px; left:50%; transform:translateX(-50%);
-    background:rgba(0,0,0,0.8); border:2px solid #f0c020;
-    border-radius:8px; padding:8px 20px; color:#f0c020;
-    font-size:10px; z-index:10; pointer-events:none;
-  }
-  #welcome {
-    position:fixed; top:0; left:0; right:0; bottom:0;
-    background:rgba(5,5,20,0.82); backdrop-filter:blur(2px);
-    z-index:100;
-    display:flex; align-items:center; justify-content:center;
-    flex-direction:column; text-align:center; padding:20px;
-  }
-  #welcome .title { color:#f0c020; font-size:22px; margin-bottom:16px; line-height:1.6; }
-  #welcome .subtitle { color:#7cb8ff; font-size:10px; margin-bottom:24px; line-height:2; }
-  #welcome .desc { font-family:sans-serif; color:#aaa; font-size:14px; line-height:1.8; max-width:420px; margin-bottom:32px; }
-  #welcome .legend { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; margin-bottom:36px; }
-  #welcome .legend-item { display:flex; align-items:center; gap:8px; font-size:9px; }
-  #welcome .legend-dot { width:12px; height:12px; border-radius:3px; }
-  #welcome .start-btn {
-    background:#f0c020; color:#1a1a2e; border:none; padding:14px 36px;
-    font-family:'Press Start 2P',monospace; font-size:11px; border-radius:8px;
-    cursor:pointer; transition:all 0.2s; box-shadow:0 4px 0 #b89015;
-  }
-  #welcome .start-btn:hover { transform:translateY(-2px); box-shadow:0 6px 0 #b89015; background:#f5cc35; }
-  #welcome .start-btn:active { transform:translateY(2px); box-shadow:0 1px 0 #b89015; }
-  #welcome .controls { color:#666; font-size:8px; margin-top:20px; line-height:2; }
-  #welcome .minifig-preview { margin-bottom:24px; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  #welcome .blink { animation:blink 1.5s infinite; }
-  @media(max-width:768px) {
-    #mobile-controls { display:block !important; }
-    #ui { bottom:120px; font-size:7px; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#1a1a2e;overflow:hidden;font-family:'Press Start 2P',monospace}
+  canvas{display:block;image-rendering:pixelated;cursor:none}
+  #ui{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);border:2px solid #555;border-radius:8px;padding:10px 16px;color:#aaa;font-size:8px;text-align:center;pointer-events:none;z-index:10;white-space:nowrap}
+  #minimap{position:fixed;bottom:16px;left:16px;z-index:10;border:2px solid #f0c020;border-radius:6px;background:rgba(0,0,0,0.7);overflow:hidden;pointer-events:none}
+  #questlog{position:fixed;top:16px;right:16px;z-index:10;background:rgba(5,5,20,0.9);border:2px solid #f0c020;border-radius:8px;width:200px;max-height:80vh;overflow:hidden;transition:width 0.3s,max-height 0.3s}
+  #questlog.collapsed{width:140px;max-height:46px}
+  #questlog .ql-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;user-select:none}
+  #questlog .ql-header h3{color:#f0c020;font-size:8px;margin:0}
+  #questlog .ql-header .ql-toggle-btn{color:#f0c020;font-size:10px;transition:transform 0.3s}
+  #questlog.collapsed .ql-header .ql-toggle-btn{transform:rotate(180deg)}
+  #questlog .ql-header .ql-mini-progress{color:#888;font-size:7px}
+  #questlog .ql-body{padding:0 12px 10px}
+  #questlog.collapsed .ql-body{display:none}
+  #questlog .ql-section{margin-bottom:8px}
+  #questlog .ql-label{color:#888;font-size:6px;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px}
+  #questlog .ql-item{display:flex;align-items:center;gap:6px;padding:3px 6px;margin:2px 0;border-radius:3px;font-size:6px;color:#aaa;cursor:default}
+  #questlog .ql-item.visited{color:#eee}
+  #questlog .ql-item .ql-check{width:10px;height:10px;border-radius:2px;border:1.5px solid #555;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  #questlog .ql-item.visited .ql-check{border-color:#4f4;background:#4f4}
+  #questlog .ql-item.visited .ql-check::after{content:'✓';color:#1a1a2e;font-size:7px}
+  #questlog .ql-item .ql-dot{width:5px;height:5px;border-radius:2px;flex-shrink:0}
+  #questlog .ql-item .ql-name{flex:1}
+  #questlog .ql-item .ql-sub{color:#666;font-size:5px}
+  #questlog .ql-progress{margin-top:8px}
+  #questlog .ql-bar{width:100%;height:4px;background:#222;border-radius:2px;overflow:hidden;margin-top:3px}
+  #questlog .ql-fill{height:100%;background:#f0c020;border-radius:2px;transition:width 0.5s}
+  #questlog .ql-ptext{color:#888;font-size:6px;text-align:center;margin-top:3px}
+  #badge{position:fixed;bottom:16px;right:16px;z-index:10;background:rgba(5,5,20,0.85);border:1.5px solid #555;border-radius:6px;padding:7px 12px;display:flex;align-items:center;gap:8px;pointer-events:none}
+  #badge .badge-dot{width:6px;height:6px;border-radius:50%;background:#4f4;animation:badgePulse 2s infinite}
+  #badge .badge-text{color:#888;font-size:6px;line-height:1.5}
+  #badge .badge-text span{color:#aaa}
+  @keyframes badgePulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  #popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.9);background:rgba(10,10,30,0.95);border:3px solid #f0c020;border-radius:12px;padding:28px 32px;color:#eee;max-width:480px;width:90%;z-index:20;display:none;box-shadow:0 0 40px rgba(240,192,32,0.2);max-height:80vh;overflow-y:auto;opacity:0;transition:opacity 0.2s,transform 0.2s}
+  #popup.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  #popup h2{color:#f0c020;font-size:13px;margin-bottom:12px;line-height:1.5}
+  #popup h3{color:#7cb8ff;font-size:10px;margin:12px 0 6px}
+  #popup p{font-family:sans-serif;font-size:13px;line-height:1.7;color:#ccc;margin-bottom:8px}
+  #popup .tag{display:inline-block;background:#2a4a6a;color:#7cb8ff;padding:3px 8px;border-radius:4px;font-size:9px;margin:2px;font-family:'Press Start 2P',monospace}
+  #popup .hobby-tag{background:#2a5a2a;color:#7cda7c}
+  #popup .contact-tag{background:#5a2a5a;color:#da7cda}
+  #popup .project-tag{background:#5a4a2a;color:#f0c020}
+  #popup .close-hint{color:#888;font-size:8px;margin-top:16px;text-align:center}
+  #popup a{color:#7cb8ff;text-decoration:none;font-family:sans-serif}
+  #popup a:hover{text-decoration:underline}
+  #overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0);z-index:15;display:none;transition:background 0.2s}
+  #overlay.show{background:rgba(0,0,0,0.5)}
+  #mobile-controls{position:fixed;bottom:20px;right:20px;z-index:10;display:none}
+  .d-btn{width:50px;height:50px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);border-radius:10px;color:white;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+  .d-btn:active{background:rgba(255,255,255,0.35)}
+  #mobile-controls .row{display:flex;justify-content:center;gap:4px;margin:2px 0}
+  #welcome{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(5,5,20,0.82);backdrop-filter:blur(2px);z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:20px;opacity:1;transition:opacity 0.5s}
+  #welcome.fadeout{opacity:0;pointer-events:none}
+  #welcome .title{color:#f0c020;font-size:22px;margin-bottom:16px;line-height:1.6}
+  #welcome .subtitle{color:#7cb8ff;font-size:10px;margin-bottom:24px;line-height:2}
+  #welcome .desc{font-family:sans-serif;color:#aaa;font-size:14px;line-height:1.8;max-width:420px;margin-bottom:32px}
+  #welcome .legend{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:36px}
+  #welcome .legend-item{display:flex;align-items:center;gap:8px;font-size:9px}
+  #welcome .legend-dot{width:12px;height:12px;border-radius:3px}
+  #welcome .start-btn{background:#f0c020;color:#1a1a2e;border:none;padding:14px 36px;font-family:'Press Start 2P',monospace;font-size:11px;border-radius:8px;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 0 #b89015}
+  #welcome .start-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #b89015;background:#f5cc35}
+  #welcome .start-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #b89015}
+  #welcome .controls{color:#666;font-size:8px;margin-top:20px;line-height:2}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+  #welcome .blink{animation:blink 1.5s infinite}
+  /* NPC speech bubble */
+  #npc-bubble{position:fixed;top:50%;left:50%;transform:translate(-50%,-60%);background:rgba(10,10,30,0.95);border:2px solid #88ccff;border-radius:10px;padding:16px 20px;color:#eee;max-width:360px;width:85%;z-index:18;display:none;box-shadow:0 0 20px rgba(100,180,255,0.15);opacity:0;transition:opacity 0.2s}
+  #npc-bubble.show{opacity:1}
+  #npc-bubble .npc-name{color:#88ccff;font-size:9px;margin-bottom:8px}
+  #npc-bubble .npc-role{color:#666;font-size:7px;margin-bottom:10px}
+  #npc-bubble .npc-text{font-family:sans-serif;font-size:13px;line-height:1.7;color:#ddd}
+  #npc-bubble .npc-hint{color:#666;font-size:7px;margin-top:10px;text-align:center}
+  #npc-bubble::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid #88ccff}
+  @media(max-width:768px){
+    #mobile-controls{display:block !important}
+    #ui{bottom:120px;font-size:7px}
+    #minimap{bottom:120px}
+    #questlog{width:160px;top:10px;right:10px}
+    #questlog .ql-item{font-size:5px}
+    #badge{bottom:120px}
   }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+<canvas id="minimap" width="160" height="120"></canvas>
+<div id="questlog">
+  <div class="ql-header" id="ql-header">
+    <h3>📋 QUEST LOG</h3>
+    <span class="ql-mini-progress" id="ql-mini">0/10</span>
+    <span class="ql-toggle-btn">▼</span>
+  </div>
+  <div class="ql-body">
+    <div id="ql-items"></div>
+    <div class="ql-progress">
+      <div class="ql-bar"><div class="ql-fill" id="ql-bar-fill" style="width:0%"></div></div>
+      <div class="ql-ptext" id="ql-ptext">0 / 10 discovered</div>
+    </div>
+  </div>
+</div>
+<div id="badge">
+  <div class="badge-dot"></div>
+  <div class="badge-text"><span>Built by a PM</span><br>with AI-enabled dev</div>
+</div>
+<div id="ui">ARROW KEYS / WASD to move — walk into highlighted areas to explore</div>
+<div id="overlay" onclick="closePopup()"></div>
+<div id="popup"><div id="popup-content"></div></div>
+<div id="npc-bubble"><div id="npc-bubble-content"></div></div>
 <div id="welcome">
-  <div class="minifig-preview">
+  <div style="margin-bottom:24px">
     <svg width="64" height="88" viewBox="0 0 64 88" fill="none">
       <rect x="16" y="0" width="32" height="10" rx="3" fill="#4a3520"/>
       <rect x="14" y="8" width="36" height="24" rx="4" fill="#f5c040"/>
@@ -103,18 +133,16 @@
   </div>
   <div class="title">MATIAS KORPISALO</div>
   <div class="subtitle">SENIOR PRODUCT MANAGER — HELSINKI, FINLAND</div>
-  <div class="desc">Welcome to my interactive portfolio. Explore my world — walk into offices to see my work experience, and discover hobby areas scattered around the map.</div>
+  <div class="desc">Welcome to my interactive portfolio. Explore my world — walk into offices, discover hobbies, talk to people, and check out what I'm building.</div>
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#7cb8ff"></div><span style="color:#7cb8ff">WORK</span></div>
     <div class="legend-item"><div class="legend-dot" style="background:#7cda7c"></div><span style="color:#7cda7c">HOBBIES</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f0c020"></div><span style="color:#f0c020">PROJECTS</span></div>
     <div class="legend-item"><div class="legend-dot" style="background:#da7cda"></div><span style="color:#da7cda">CONTACT</span></div>
   </div>
   <button class="start-btn" id="start-btn">▶ EXPLORE</button>
-  <div class="controls">ARROW KEYS / WASD TO MOVE<br><span class="blink">WALK INTO HIGHLIGHTED AREAS</span></div>
+  <div class="controls">ARROW KEYS / WASD TO MOVE<br><span class="blink">WALK INTO AREAS & TALK TO PEOPLE</span></div>
 </div>
-<div id="ui">ARROW KEYS / WASD to move — walk into highlighted areas to explore</div>
-<div id="overlay" onclick="closePopup()"></div>
-<div id="popup"><div id="popup-content"></div></div>
 <div id="mobile-controls">
   <div class="row"><div class="d-btn" data-dir="up">▲</div></div>
   <div class="row">
@@ -126,541 +154,508 @@
 <script>
 let gameStarted=false;
 document.getElementById('start-btn').addEventListener('click',function(){
-  document.getElementById('welcome').style.display='none';
+  const el=document.getElementById('welcome');
+  el.classList.add('fadeout');
+  setTimeout(()=>{el.style.display='none'},500);
   gameStarted=true;
 });
 
-const C=document.getElementById('c'), X=C.getContext('2d');
+const C=document.getElementById('c'),X=C.getContext('2d');
+const MC=document.getElementById('minimap'),MX=MC.getContext('2d');
 let W,H,scale;
-const TILE=16, COLS=40, ROWS=30;
+const TILE=16,COLS=50,ROWS=38;
 const CAM={x:0,y:0};
 const keys={};
-let popupOpen=false, lastZoneId=null, zoneCooldown=false;
+let popupOpen=false,lastZoneId=null,zoneCooldown=false;
+let npcBubbleOpen=false,lastNpcId=null,npcCooldown=false;
 
-const T={
-  GRASS:0,PATH:1,WATER:2,FLOOR:3,WALL:4,DOOR:5,
-  TREE:6,DESK:7,SIGN:8,MAT:9,FLOWER:10,FENCE:11,
-  BRIDGE:12,SAND:13,TATAMI:14,BOOKSHELF:15,PC:16,STONE:17,MAILBOX:18
-};
+// === PARTICLES ===
+const particles=[];
+function spawnP(x,y,type){
+  const p={x,y,type,life:1,maxLife:1};
+  if(type==='dust'){p.vx=(Math.random()-0.5)*0.8;p.vy=-Math.random()*0.5-0.2;p.maxLife=0.4+Math.random()*0.3;p.life=p.maxLife;p.size=1+Math.random()*1.5;}
+  else if(type==='sparkle'){p.vx=(Math.random()-0.5)*1.5;p.vy=-Math.random()*2-1;p.maxLife=0.6+Math.random()*0.4;p.life=p.maxLife;p.size=1+Math.random()*2;}
+  else if(type==='leaf'){p.vx=(Math.random()-0.5)*0.3;p.vy=-Math.random()*0.3-0.1;p.maxLife=1.5+Math.random();p.life=p.maxLife;p.size=2+Math.random()*2;p.rot=Math.random()*Math.PI*2;p.rotV=(Math.random()-0.5)*3;}
+  particles.push(p);
+}
+function updateParticles(dt){
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];p.life-=dt;
+    if(p.life<=0){particles.splice(i,1);continue;}
+    p.x+=p.vx*dt*TILE;p.y+=p.vy*dt*TILE;
+    if(p.type==='leaf'){p.rot+=p.rotV*dt;p.vx+=Math.sin(Date.now()/500+i)*0.1*dt;}
+  }
+}
+function drawParticles(){
+  const s=scale;
+  particles.forEach(p=>{
+    const sx=(p.x-CAM.x)*scale,sy=(p.y-CAM.y)*scale;
+    const a=Math.min(1,p.life/p.maxLife*2);
+    if(p.type==='dust'){X.fillStyle=`rgba(200,185,150,${a*0.6})`;X.fillRect(sx,sy,p.size*s,p.size*s);}
+    else if(p.type==='sparkle'){X.fillStyle=`rgba(255,230,100,${a*0.8})`;const sz=p.size*s*a;X.fillRect(sx-sz/2,sy-sz/2,sz,sz);X.fillStyle=`rgba(255,255,200,${a*0.4})`;X.fillRect(sx-sz,sy-0.5*s,sz*2,1*s);X.fillRect(sx-0.5*s,sy-sz,1*s,sz*2);}
+    else if(p.type==='leaf'){X.save();X.translate(sx,sy);X.rotate(p.rot);X.fillStyle=`rgba(60,140,60,${a*0.7})`;X.fillRect(-p.size*s/2,-p.size*s/4,p.size*s,p.size*s/2);X.restore();}
+  });
+}
+let lastFX=0,lastFY=0;
+function handleFootsteps(){
+  if(!P.moving)return;
+  const dx=P.x-lastFX,dy=P.y-lastFY;
+  if(Math.sqrt(dx*dx+dy*dy)>0.5){
+    lastFX=P.x;lastFY=P.y;
+    const tx=Math.floor(P.x),ty=Math.floor(P.y),t=map[ty]?.[tx];
+    if(t===T.PATH||t===T.BRIDGE||t===T.FLOOR) for(let i=0;i<2;i++) spawnP(P.x*TILE+Math.random()*8-4,P.y*TILE+12+Math.random()*4,'dust');
+    if(t===T.GRASS){
+      const near=[[tx-1,ty],[tx+1,ty],[tx,ty-1],[tx,ty+1]].some(([x,y])=>map[y]?.[x]===T.TREE);
+      if(near&&Math.random()<0.3) spawnP(P.x*TILE+Math.random()*12-6,P.y*TILE-Math.random()*8,'leaf');
+    }
+  }
+}
+let ambT=0;
+function handleAmbient(dt){
+  ambT+=dt;if(ambT<0.8)return;ambT=0;
+  const px=Math.floor(P.x),py=Math.floor(P.y);
+  for(let dy=-5;dy<5;dy++) for(let dx=-5;dx<5;dx++){
+    const tx=px+dx,ty=py+dy;
+    if(tx>=0&&tx<COLS&&ty>=0&&ty<ROWS){
+      if((map[ty][tx]===T.WATER||map[ty][tx]===T.POND_LILY)&&Math.random()<0.05) spawnP(tx*TILE+Math.random()*16,ty*TILE+Math.random()*16,'sparkle');
+      if(map[ty][tx]===T.TREE&&Math.random()<0.02) spawnP(tx*TILE+Math.random()*16,ty*TILE+Math.random()*8,'leaf');
+    }
+  }
+}
 
-const TC={
-  [T.GRASS]:'#3a8a3a',[T.PATH]:'#c8b898',[T.WATER]:'#2266aa',
-  [T.FLOOR]:'#d4c4a0',[T.WALL]:'#6a5a4a',[T.DOOR]:'#c08030',
-  [T.TREE]:'#2a6a2a',[T.DESK]:'#8a7050',[T.SIGN]:'#c08030',
-  [T.MAT]:'#aa3030',[T.FLOWER]:'#da6a90',[T.FENCE]:'#9a8060',
-  [T.BRIDGE]:'#a08050',[T.SAND]:'#e8d8a0',[T.TATAMI]:'#8aaa60',
-  [T.BOOKSHELF]:'#6a4a30',[T.PC]:'#334',[T.STONE]:'#778',[T.MAILBOX]:'#3a8a3a'
-};
-
+const T={GRASS:0,PATH:1,WATER:2,FLOOR:3,WALL:4,DOOR:5,TREE:6,DESK:7,SIGN:8,MAT:9,FLOWER:10,FENCE:11,BRIDGE:12,SAND:13,TATAMI:14,BOOKSHELF:15,PC:16,STONE:17,MAILBOX:18,LAMP:19,BENCH:20,BUSH:21,SIGN_POST:22,POND_LILY:23};
 const map=Array(ROWS).fill(null).map(()=>Array(COLS).fill(T.GRASS));
-const solid=new Set([T.WALL,T.TREE,T.DESK,T.WATER,T.FENCE,T.BOOKSHELF,T.PC,T.STONE,T.MAILBOX]);
+const solid=new Set([T.WALL,T.TREE,T.DESK,T.WATER,T.FENCE,T.BOOKSHELF,T.PC,T.STONE,T.MAILBOX,T.LAMP,T.BENCH,T.BUSH]);
 
-// Zones
-const zones=[];
-function addZone(y,x1,x2,id){ zones.push({y,x1,x2,id}); }
+const zones=[],beacons=[],visited={};
 
-// Beacon data for hovering indicators
-const beacons=[];
+function addZone(y,x1,x2,id){zones.push({y,x1,x2,id})}
+
+// === NPCs ===
+const npcs=[
+  {x:16,y:18,dir:0,name:'Emma',role:'Designer',bodyCol:'#c04080',hairCol:'#8a4a20',
+    quote:'"Matias always pushed us to validate with real users before building anything. That mindset saved us months of wasted work."',
+    path:[[16,18],[16,17],[16,16],[16,17]],pathIdx:0,pathTimer:0,speed:1.2},
+  {x:28,y:19,dir:2,name:'Tomi',role:'Engineer',bodyCol:'#40a060',hairCol:'#222',
+    quote:'"Best PM I\'ve worked with. He actually understands the technical trade-offs and never asks for something without knowing the cost."',
+    path:[[28,19],[30,19],[32,19],[30,19]],pathIdx:0,pathTimer:0,speed:1},
+  {x:10,y:6,dir:0,name:'Rafael',role:'BJJ Training Partner',bodyCol:'#ffffff',hairCol:'#1a1a1a',
+    quote:'"He treats every roll like a product problem — always two steps ahead and annoyingly strategic. Same energy on and off the mat."',
+    path:[[10,6],[11,6],[12,6],[11,6]],pathIdx:0,pathTimer:0,speed:0.8},
+  {x:22,y:24,dir:1,name:'Laura',role:'Product Manager',bodyCol:'#6060c0',hairCol:'#c08040',
+    quote:'"He launched BNPL from zero and it beat every adoption target in six months. Probably the most structured PM I know — always has the data to back up his calls."',
+    path:[[22,24],[22,23],[22,22],[22,23]],pathIdx:0,pathTimer:0,speed:0.9},
+  {x:36,y:18,dir:0,name:'Mikko',role:'Startup Founder',bodyCol:'#c08020',hairCol:'#3a2a1a',
+    quote:'"When the startup ran out of runway, Matias had already shipped an MVP and validated the core assumptions. Most PMs never get that far with unlimited budget."',
+    path:[[36,18],[36,17],[37,17],[37,18]],pathIdx:0,pathTimer:0,speed:1.1},
+];
+
+function updateNPCs(dt){
+  npcs.forEach(n=>{
+    n.pathTimer+=dt*n.speed;
+    if(n.pathTimer>2){
+      n.pathTimer=0;
+      n.pathIdx=(n.pathIdx+1)%n.path.length;
+    }
+    const target=n.path[n.pathIdx];
+    const dx=target[0]-n.x,dy=target[1]-n.y;
+    const spd=1.5*dt;
+    if(Math.abs(dx)>0.05){n.x+=Math.sign(dx)*spd;n.dir=dx>0?2:1;}
+    if(Math.abs(dy)>0.05){n.y+=Math.sign(dy)*spd;n.dir=dy>0?0:3;}
+  });
+}
+
+function drawNPC(n){
+  const s=scale;
+  const sx=(n.x*TILE-CAM.x)*scale,sy=(n.y*TILE-CAM.y)*scale;
+  if(sx<-50||sx>W+50||sy<-50||sy>H+50)return;
+  const bob=Math.sin(Date.now()/150+n.x*3)*1*s;
+  const py=sy+bob;
+  // Shadow
+  X.fillStyle='rgba(0,0,0,0.15)';X.fillRect(sx+2*s,sy+13*s,12*s,3*s);
+  // Hair
+  X.fillStyle=n.hairCol;X.fillRect(sx+4*s,py+0*s,8*s,3*s);
+  if(n.dir!==3)X.fillRect(sx+4*s,py+1*s,9*s,2*s);
+  // Head
+  X.fillStyle='#f5c040';X.fillRect(sx+4*s,py+2*s,8*s,5*s);
+  // Face
+  if(n.dir!==3){
+    X.fillStyle='#222';
+    X.fillRect(sx+5*s,py+4*s,2*s,1*s);X.fillRect(sx+9*s,py+4*s,2*s,1*s);
+    X.fillRect(sx+6*s,py+6*s,4*s,1*s);
+  }
+  // Body
+  X.fillStyle=n.bodyCol;X.fillRect(sx+3*s,py+7*s,10*s,5*s);
+  // Arms
+  X.fillStyle='#f5c040';
+  const arm=Math.sin(Date.now()/150+n.x*3)*1.5*s;
+  X.fillRect(sx+1*s,py+(8+arm/s)*s,3*s,3*s);X.fillRect(sx+12*s,py+(8-arm/s)*s,3*s,3*s);
+  // Legs
+  X.fillStyle='#444';
+  const leg=Math.sin(Date.now()/150+n.x*3)*1;
+  X.fillRect(sx+4*s,py+12*s,4*s,(3+leg)*s);X.fillRect(sx+8*s,py+12*s,4*s,(3-leg)*s);
+
+  // Name tag
+  const dist=Math.sqrt((P.x-n.x)**2+(P.y-n.y)**2);
+  const nearby=dist<4;
+  X.fillStyle='rgba(0,0,0,0.7)';
+  const nameW=n.name.length*3*s+12*s;
+  X.fillRect(sx+8*s-nameW/2,py-8*s,nameW,7*s);
+  X.fillStyle=nearby?'#88ccff':'#ccc';
+  X.font=`${2.5*s}px 'Press Start 2P'`;X.textAlign='center';
+  X.fillText(n.name,sx+8*s,py-3.5*s);
+  X.textAlign='left';
+
+  // Chat icon when nearby
+  if(nearby){
+    const chatY=py-14*s+Math.sin(Date.now()/300)*2*s;
+    X.fillStyle='#88ccff';X.font=`${4*s}px 'Press Start 2P'`;
+    X.textAlign='center';X.fillText('💬',sx+8*s,chatY);X.textAlign='left';
+  }
+}
+
+function checkNPCs(){
+  if(npcCooldown||popupOpen||npcBubbleOpen)return;
+  for(const n of npcs){
+    const dist=Math.sqrt((P.x-n.x)**2+(P.y-n.y)**2);
+    if(dist<2){
+      if(lastNpcId!==n.name){
+        lastNpcId=n.name;
+        showNPCBubble(n);
+      }
+      return;
+    }
+  }
+  lastNpcId=null;
+}
+
+function showNPCBubble(n){
+  npcBubbleOpen=true;
+  let html=`<div class="npc-name">💬 ${n.name}</div>`;
+  html+=`<div class="npc-role">${n.role}</div>`;
+  html+=`<div class="npc-text">${n.quote}</div>`;
+  html+=`<div class="npc-hint">Press ESC or walk away to close</div>`;
+  document.getElementById('npc-bubble-content').innerHTML=html;
+  const el=document.getElementById('npc-bubble');
+  el.style.display='block';
+  requestAnimationFrame(()=>el.classList.add('show'));
+}
+
+function closeNPCBubble(){
+  npcBubbleOpen=false;npcCooldown=true;
+  setTimeout(()=>{npcCooldown=false},500);
+  const el=document.getElementById('npc-bubble');
+  el.classList.remove('show');
+  setTimeout(()=>{el.style.display='none'},200);
+}
+
+function checkNPCDistance(){
+  if(!npcBubbleOpen)return;
+  let near=false;
+  for(const n of npcs){
+    if(n.name===lastNpcId&&Math.sqrt((P.x-n.x)**2+(P.y-n.y)**2)<3.5){near=true;break;}
+  }
+  if(!near) closeNPCBubble();
+}
+
+const questItems=[
+  {id:'aibidia',label:'Aibidia',peek:'Product Manager · 2025→Now',type:'work',icon:'🏢'},
+  {id:'alicent',label:'Alicent',peek:'Senior PM · AI Startup · 0→1',type:'work',icon:'🚀'},
+  {id:'nordea',label:'Nordea',peek:'Senior PM · BNPL · FinTech',type:'work',icon:'🏦'},
+  {id:'if_insurance',label:'If Insurance',peek:'PM · Digital Sales & CX',type:'work',icon:'🛡️'},
+  {id:'bjj',label:'Brazilian Jiu-Jitsu',peek:'The gentle art',type:'hobby',icon:'🥋'},
+  {id:'reading',label:'Reading',peek:'Never stop learning',type:'hobby',icon:'📚'},
+  {id:'strategy',label:'Strategy Games',peek:'Systems thinking',type:'hobby',icon:'🎮'},
+  {id:'tech',label:'Tech Tinkering',peek:'Hands-on building',type:'hobby',icon:'🔧'},
+  {id:'projects',label:'Side Projects',peek:'Notes app for focus',type:'project',icon:'🚧'},
+  {id:'contact',label:'Contact Me',peek:'Get in touch',type:'contact',icon:'📬'},
+];
+
+function renderQuestLog(){
+  const sections={work:{label:'EXPERIENCE',items:[]},hobby:{label:'HOBBIES',items:[]},project:{label:'PROJECTS',items:[]},contact:{label:'CONTACT',items:[]}};
+  questItems.forEach(q=>sections[q.type].items.push(q));
+  const colMap={work:'#7cb8ff',hobby:'#7cda7c',project:'#f0c020',contact:'#da7cda'};
+  let html='';
+  for(const key in sections){
+    const sec=sections[key];if(!sec.items.length)continue;
+    html+=`<div class="ql-section"><div class="ql-label">${sec.label}</div>`;
+    sec.items.forEach(q=>{
+      html+=`<div class="ql-item ${visited[q.id]?'visited':''}">
+        <div class="ql-check"></div>
+        <div class="ql-dot" style="background:${colMap[q.type]}"></div>
+        <div><div class="ql-name">${q.icon} ${q.label}</div><div class="ql-sub">${q.peek}</div></div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+  document.getElementById('ql-items').innerHTML=html;
+  const total=questItems.length,done=Object.keys(visited).length;
+  document.getElementById('ql-bar-fill').style.width=`${(done/total)*100}%`;
+  document.getElementById('ql-ptext').textContent=`${done} / ${total} discovered`;
+  document.getElementById('ql-mini').textContent=`${done}/${total}`;
+}
 
 function buildMap(){
-  // Main horizontal road
-  for(let x=2;x<38;x++){map[15][x]=T.PATH;map[16][x]=T.PATH;}
-  // Vertical road
-  for(let y=5;y<25;y++){map[y][20]=T.PATH;map[y][21]=T.PATH;}
-  // Side paths
-  for(let y=10;y<15;y++){map[y][8]=T.PATH;map[y][9]=T.PATH;}
-  for(let y=17;y<22;y++){map[y][8]=T.PATH;map[y][9]=T.PATH;}
-  for(let y=10;y<15;y++){map[y][30]=T.PATH;map[y][31]=T.PATH;}
-  for(let y=17;y<22;y++){map[y][30]=T.PATH;map[y][31]=T.PATH;}
-  // Extra path to contact area
-  for(let x=20;x<28;x++){map[26][x]=T.PATH;map[27][x]=T.PATH;}
-
-  // Water pond
-  for(let y=2;y<5;y++) for(let x=34;x<38;x++) map[y][x]=T.WATER;
-  map[2][35]=T.WATER;map[5][35]=T.WATER;map[5][36]=T.WATER;
-  map[3][33]=T.BRIDGE;map[4][33]=T.BRIDGE;
-  for(let x=33;x<39;x++){map[1][x]=T.SAND;map[5][x]=T.SAND;}
-  map[2][33]=T.SAND;map[3][38]=T.SAND;map[4][38]=T.SAND;
-
-  // Trees
-  const trees=[[0,0],[0,5],[0,12],[0,18],[0,25],[0,35],
-    [1,2],[1,10],[1,19],[1,27],
-    [3,0],[3,3],[4,1],[5,5],[6,0],[7,2],
-    [3,14],[3,16],[4,13],[5,17],
-    [24,0],[25,2],[26,1],[27,0],[24,5],[25,6],
-    [24,35],[25,37],[26,36],[27,38],[28,35],
-    [2,24],[3,26],[4,23],[5,27],[6,25],
-    [27,14],[28,16],[27,20],[28,22],[26,25],
-    [8,36],[9,38],[7,37],[10,35],
-    [0,38],[1,38],[0,39],[28,0],[29,0],[29,5],
-    [29,10],[29,15],[29,25],[29,30],[29,35]];
-  trees.forEach(([y,x])=>{if(y<ROWS&&x<COLS)map[y][x]=T.TREE;});
-
-  // Flowers
-  [[1,7],[2,9],[6,3],[5,26],[24,3],[25,10],[3,30],[26,30],[7,14]].forEach(([y,x])=>{
-    if(y<ROWS&&x<COLS)map[y][x]=T.FLOWER;
-  });
-
-  // Stones
-  [[14,3],[17,35],[23,8],[6,33],[13,26]].forEach(([y,x])=>map[y][x]=T.STONE);
-
-  // === BUILDINGS ===
-  buildRoom(7,5,8,6,'aibidia');
-  buildRoom(7,23,8,6,'alicent');
-  buildRoom(18,5,8,6,'nordea');
-  buildRoom(18,23,8,6,'if_insurance');
-
-  // === HOBBY AREAS ===
-  buildDojo(3,7);
-  buildReadingNook(22,33);
-  buildGameDen(22,14);
-  buildWorkshop(8,33);
-
-  // === CONTACT AREA ===
-  buildContact(25,27);
-
-  // Fences around dojo
-  for(let x=13;x<18;x++){map[2][x]=T.FENCE;map[6][x]=T.FENCE;}
-  for(let y=2;y<7;y++){map[y][13]=T.FENCE;map[y][18]=T.FENCE;}
-  map[4][13]=T.GRASS;map[4][18]=T.GRASS;
+  for(let x=2;x<48;x++){map[18][x]=T.PATH;map[19][x]=T.PATH}
+  for(let y=4;y<34;y++){map[y][24]=T.PATH;map[y][25]=T.PATH}
+  for(let y=10;y<18;y++){map[y][10]=T.PATH;map[y][11]=T.PATH}
+  for(let y=10;y<18;y++){map[y][38]=T.PATH;map[y][39]=T.PATH}
+  for(let y=20;y<28;y++){map[y][10]=T.PATH;map[y][11]=T.PATH}
+  for(let y=20;y<28;y++){map[y][38]=T.PATH;map[y][39]=T.PATH}
+  for(let x=24;x<40;x++){map[30][x]=T.PATH;map[31][x]=T.PATH}
+  for(let y=28;y<34;y++){map[y][10]=T.PATH;map[y][11]=T.PATH}
+  for(let x=4;x<47;x+=6){map[17][x]=T.LAMP;map[20][x]=T.LAMP}
+  [[17,14],[17,34],[20,14],[20,34],[29,24],[29,25]].forEach(([y,x])=>map[y][x]=T.BENCH);
+  for(let y=2;y<7;y++) for(let x=40;x<47;x++) map[y][x]=T.WATER;
+  map[7][42]=T.WATER;map[7][43]=T.WATER;map[7][44]=T.WATER;
+  map[3][42]=T.POND_LILY;map[4][44]=T.POND_LILY;map[5][41]=T.POND_LILY;
+  for(let x=39;x<48;x++){map[1][x]=T.SAND;map[7][x]=T.SAND;map[8][x]=T.SAND}
+  for(let y=2;y<7;y++){map[y][39]=T.SAND;map[y][47]=T.SAND}
+  map[4][38]=T.BRIDGE;map[5][38]=T.BRIDGE;map[4][39]=T.BRIDGE;map[5][39]=T.BRIDGE;
+  [[0,0],[0,1],[0,3],[0,5],[0,7],[1,0],[1,2],[1,4],[1,6],[2,1],[2,3],[2,5],[3,0],[3,2],[3,4],[4,0],[4,3],[5,1],[5,4],[6,0],[6,3],[0,15],[0,17],[0,19],[0,21],[1,16],[1,18],[1,20],[2,15],[2,19],[3,17],[0,48],[0,49],[1,47],[1,49],[2,48],[8,48],[9,47],[9,49],[10,48],[32,0],[33,1],[34,0],[35,2],[36,0],[36,1],[37,0],[37,3],[32,4],[33,5],[34,3],[35,5],[33,46],[34,47],[35,48],[36,46],[37,47],[37,49],[36,49],[34,44],[35,45],[32,48],[33,49],[12,2],[14,3],[16,2],[22,2],[26,3],[28,1],[12,47],[14,46],[16,48],[22,47],[26,46],[30,16],[31,14],[32,17],[30,44],[31,46],[32,43]].forEach(([y,x])=>{if(y<ROWS&&x<COLS)map[y][x]=T.TREE});
+  [[7,8],[7,12],[7,30],[7,36],[23,6],[23,14],[23,36],[23,44],[11,20],[11,28],[27,20],[27,28],[15,6],[15,44],[33,20],[33,28]].forEach(([y,x])=>{if(y<ROWS&&x<COLS)map[y][x]=T.BUSH});
+  [[1,9],[2,12],[6,6],[5,30],[4,32],[24,3],[25,8],[3,28],[26,44],[28,36],[9,22],[9,26],[29,22],[29,26],[20,6],[20,44]].forEach(([y,x])=>{if(y<ROWS&&x<COLS)map[y][x]=T.FLOWER});
+  [[14,5],[17,42],[23,9],[6,38],[13,32],[28,5],[30,8]].forEach(([y,x])=>map[y][x]=T.STONE);
+  map[17][8]=T.SIGN_POST;map[17][22]=T.SIGN_POST;map[17][36]=T.SIGN_POST;map[20][8]=T.SIGN_POST;
+  buildRoom(8,6,8,6,'aibidia');buildRoom(8,28,8,6,'alicent');
+  buildRoom(21,6,8,6,'nordea');buildRoom(21,28,8,6,'if_insurance');
+  buildDojo(4,8);buildReadingNook(28,40);buildGameDen(28,16);buildWorkshop(10,42);
+  buildProjectArea(32,36);buildContact(31,6);
+  for(let x=7;x<14;x++){map[3][x]=T.FENCE;map[8][x]=T.FENCE}
+  for(let y=3;y<9;y++){map[y][7]=T.FENCE;map[y][14]=T.FENCE}
+  map[6][7]=T.GRASS;map[6][14]=T.GRASS;
 }
 
 function buildRoom(sy,sx,w,h,id){
   for(let y=sy;y<sy+h;y++) for(let x=sx;x<sx+w;x++){
-    if(y===sy||y===sy+h-1||x===sx||x===sx+w-1) map[y][x]=T.WALL;
-    else map[y][x]=T.FLOOR;
-  }
-  const dx=sx+Math.floor(w/2);
-  map[sy+h-1][dx]=T.DOOR;map[sy+h-1][dx+1]=T.DOOR;
-  map[sy+1][sx+1]=T.DESK;map[sy+1][sx+2]=T.PC;
-  map[sy+1][sx+w-2]=T.DESK;map[sy+1][sx+w-3]=T.PC;
-  addZone(sy+h,dx,dx+1,id);
-  beacons.push({x:dx+1,y:sy+h,id,type:'work'});
+    if(y===sy||y===sy+h-1||x===sx||x===sx+w-1)map[y][x]=T.WALL;else map[y][x]=T.FLOOR;}
+  const dx=sx+Math.floor(w/2);map[sy+h-1][dx]=T.DOOR;map[sy+h-1][dx+1]=T.DOOR;
+  map[sy+1][sx+1]=T.DESK;map[sy+1][sx+2]=T.PC;map[sy+1][sx+w-2]=T.DESK;map[sy+1][sx+w-3]=T.PC;map[sy+2][sx+w-2]=T.BOOKSHELF;
+  addZone(sy+h,dx,dx+1,id);beacons.push({x:dx+1,y:sy+h,id,type:'work'});
 }
+function buildDojo(sy,sx){for(let y=sy;y<sy+4;y++) for(let x=sx;x<sx+5;x++) map[y][x]=T.TATAMI;map[sy][sx]=T.MAT;map[sy+3][sx+4]=T.MAT;map[sy+1][sx+2]=T.MAT;addZone(sy,sx,sx+4,'bjj');beacons.push({x:sx+2,y:sy+2,id:'bjj',type:'hobby'})}
+function buildReadingNook(sy,sx){for(let y=sy;y<sy+4;y++) for(let x=sx;x<sx+5;x++) map[y][x]=T.FLOOR;map[sy][sx]=T.BOOKSHELF;map[sy][sx+1]=T.BOOKSHELF;map[sy][sx+2]=T.BOOKSHELF;map[sy][sx+3]=T.BOOKSHELF;map[sy+1][sx+4]=T.LAMP;addZone(sy,sx,sx+4,'reading');beacons.push({x:sx+2,y:sy+2,id:'reading',type:'hobby'})}
+function buildGameDen(sy,sx){for(let y=sy;y<sy+4;y++) for(let x=sx;x<sx+5;x++) map[y][x]=T.FLOOR;map[sy][sx]=T.PC;map[sy][sx+4]=T.PC;map[sy+1][sx+1]=T.DESK;map[sy+1][sx+3]=T.DESK;map[sy][sx+2]=T.LAMP;addZone(sy,sx,sx+4,'strategy');beacons.push({x:sx+2,y:sy+3,id:'strategy',type:'hobby'})}
+function buildWorkshop(sy,sx){for(let y=sy;y<sy+4;y++) for(let x=sx;x<sx+5;x++) map[y][x]=T.FLOOR;map[sy][sx]=T.PC;map[sy][sx+1]=T.DESK;map[sy][sx+2]=T.PC;map[sy][sx+4]=T.BOOKSHELF;map[sy+1][sx]=T.LAMP;addZone(sy,sx,sx+4,'tech');beacons.push({x:sx+2,y:sy+2,id:'tech',type:'hobby'})}
+function buildProjectArea(sy,sx){for(let y=sy;y<sy+5;y++) for(let x=sx;x<sx+7;x++){if(y===sy||y===sy+4||x===sx||x===sx+6)map[y][x]=T.WALL;else map[y][x]=T.FLOOR}map[sy+4][sx+3]=T.DOOR;map[sy+4][sx+4]=T.DOOR;map[sy+1][sx+1]=T.PC;map[sy+1][sx+2]=T.DESK;map[sy+1][sx+3]=T.PC;map[sy+1][sx+5]=T.BOOKSHELF;map[sy+2][sx+5]=T.LAMP;addZone(sy+4,sx+3,sx+4,'projects');beacons.push({x:sx+3,y:sy+5,id:'projects',type:'project'})}
+function buildContact(sy,sx){for(let y=sy;y<sy+3;y++) for(let x=sx;x<sx+4;x++) map[y][x]=T.FLOOR;map[sy][sx+1]=T.MAILBOX;map[sy][sx+3]=T.LAMP;addZone(sy,sx,sx+3,'contact');beacons.push({x:sx+2,y:sy+2,id:'contact',type:'contact'})}
 
-function buildDojo(sy,sx){
-  for(let y=sy;y<sy+3;y++) for(let x=sx;x<sx+4;x++) map[y][x]=T.TATAMI;
-  map[sy][sx]=T.MAT;map[sy+2][sx+3]=T.MAT;
-  addZone(sy,sx,sx+3,'bjj');
-  beacons.push({x:sx+2,y:sy+1,id:'bjj',type:'hobby'});
-}
-
-function buildReadingNook(sy,sx){
-  for(let y=sy;y<sy+3;y++) for(let x=sx;x<sx+4;x++) map[y][x]=T.FLOOR;
-  map[sy][sx]=T.BOOKSHELF;map[sy][sx+1]=T.BOOKSHELF;map[sy][sx+2]=T.BOOKSHELF;
-  addZone(sy,sx,sx+3,'reading');
-  beacons.push({x:sx+2,y:sy+2,id:'reading',type:'hobby'});
-}
-
-function buildGameDen(sy,sx){
-  for(let y=sy;y<sy+3;y++) for(let x=sx;x<sx+4;x++) map[y][x]=T.FLOOR;
-  map[sy][sx]=T.PC;map[sy][sx+3]=T.PC;map[sy+1][sx+1]=T.DESK;
-  addZone(sy,sx,sx+3,'strategy');
-  beacons.push({x:sx+2,y:sy+2,id:'strategy',type:'hobby'});
-}
-
-function buildWorkshop(sy,sx){
-  for(let y=sy;y<sy+3;y++) for(let x=sx;x<sx+4;x++) map[y][x]=T.FLOOR;
-  map[sy][sx]=T.PC;map[sy][sx+1]=T.DESK;map[sy][sx+2]=T.PC;
-  addZone(sy,sx,sx+3,'tech');
-  beacons.push({x:sx+2,y:sy+2,id:'tech',type:'hobby'});
-}
-
-function buildContact(sy,sx){
-  for(let y=sy;y<sy+3;y++) for(let x=sx;x<sx+4;x++) map[y][x]=T.FLOOR;
-  map[sy][sx+1]=T.MAILBOX;
-  addZone(sy,sx,sx+3,'contact');
-  beacons.push({x:sx+2,y:sy+2,id:'contact',type:'contact'});
-}
-
-const P={x:20,y:16,dir:0,frame:0,frameT:0,moving:false};
+const P={x:24,y:19,dir:0,moving:false};
 
 const popups={
-  aibidia:{
-    title:'🏢 AIBIDIA',
-    subtitle:'Product Manager — Mar 2025 → Present',
-    body:'Scaling SaaS for enterprise B2B clients. Leading product strategy, discovery & delivery for a core product. Driving analytics (DAU/WAU/MAU), owning GTM launches, and running a senior engineering team.',
-    tags:['Product Strategy','GTM Launches','Analytics','Agile','Enterprise SaaS','Discovery']
-  },
-  alicent:{
-    title:'🚀 ALICENT',
-    subtitle:'Senior Product Manager — Jan 2024 → Feb 2025',
-    body:'Early-stage startup — 0→1 ownership. Launched AI-powered SaaS from concept to MVP as founding PM. Conducted extensive client discovery, owned full product lifecycle, collaborated on AI models & CRM integrations.',
-    tags:['0→1 Build','AI/ML','MVP Launch','Client Discovery','CRM Integration']
-  },
-  nordea:{
-    title:'🏦 NORDEA',
-    subtitle:'Senior Product Manager — Mar 2022 → Feb 2024',
-    body:'Consumer finance & BNPL product leadership. Launched BNPL product exceeding adoption & revenue targets in first 6 months. Introduced A/B testing, built metrics frameworks, coached junior PMs, and developed business cases for product expansion.',
-    tags:['BNPL Launch','A/B Testing','Portfolio Mgmt','Mentoring','Business Cases']
-  },
-  if_insurance:{
-    title:'🛡️ IF INSURANCE',
-    subtitle:'Product Manager, Digital Sales & CX — May 2019 → Jan 2022',
-    body:'Led digital sales & customer experience for a major Nordic insurer. Drove +20% signups, +30% marketing consent, and 10% online sales growth through systematic A/B testing and funnel optimization.',
-    tags:['+20% Signups','+10% Sales','CX Design','Funnel Optimization','A/B Testing']
-  },
-  bjj:{
-    title:'🥋 BRAZILIAN JIU-JITSU',
-    subtitle:'The Gentle Art',
-    body:'Training BJJ — the art of human chess on the mats. Problem-solving with your body, learning patience, and getting comfortable being uncomfortable. The best metaphor for product work there is.',
-    tags:['Discipline','Problem Solving','Resilience'],hobby:true
-  },
-  reading:{
-    title:'📚 READING',
-    subtitle:'Never stop learning',
-    body:'Constantly reading — product management, strategy, psychology, sci-fi, and everything in between. Books shape how I think about building products and leading teams.',
-    tags:['Product Books','Strategy','Psychology','Sci-Fi'],hobby:true
-  },
-  strategy:{
-    title:'🎮 STRATEGY GAMES',
-    subtitle:'Systems thinking playground',
-    body:'Playing strategy games — from grand strategy to tactical puzzles. It\'s how I unwind while still exercising the systems thinking and decision-making muscles that matter in product work.',
-    tags:['Systems Thinking','Decision Making','Optimization'],hobby:true
-  },
-  tech:{
-    title:'🔧 TECH PROJECTS',
-    subtitle:'Building things for fun',
-    body:'Tinkering on personal technical projects — experimenting with new tools, building small apps, exploring AI/ML, and staying hands-on with the technology side. A PM who codes is a PM who understands.',
-    tags:['Side Projects','AI Experiments','Full-Stack','Prototyping'],hobby:true
-  },
-  contact:{
-    title:'📬 CONTACT ME',
-    subtitle:'Let\'s connect!',
-    body:'Want to chat about product, collaborate, or just say hi?<br><br>📧 <a href="mailto:matias.korpisalo@outlook.com">matias.korpisalo@outlook.com</a>',
-    tags:['Open to opportunities','Coffee chats','Collaboration'],contact:true
-  }
+  aibidia:{title:'🏢 AIBIDIA',subtitle:'Product Manager — Mar 2025 → Present',body:'Scaling SaaS for enterprise B2B clients. Leading product strategy, discovery & delivery for a core product. Driving analytics (DAU/WAU/MAU), owning GTM launches, and running a senior engineering team.',tags:['Product Strategy','GTM Launches','Analytics','Agile','Enterprise SaaS','Discovery']},
+  alicent:{title:'🚀 ALICENT',subtitle:'Senior Product Manager — Jan 2024 → Feb 2025',body:'Early-stage startup — 0→1 ownership. Launched AI-powered SaaS from concept to MVP as founding PM. Conducted extensive client discovery, owned full product lifecycle, collaborated on AI models & CRM integrations.',tags:['0→1 Build','AI/ML','MVP Launch','Client Discovery','CRM Integration']},
+  nordea:{title:'🏦 NORDEA',subtitle:'Senior Product Manager — Mar 2022 → Feb 2024',body:'Consumer finance & BNPL product leadership. Launched BNPL product exceeding adoption & revenue targets in first 6 months. Introduced A/B testing, built metrics frameworks, coached junior PMs, and developed business cases for product expansion.',tags:['BNPL Launch','A/B Testing','Portfolio Mgmt','Mentoring','Business Cases']},
+  if_insurance:{title:'🛡️ IF INSURANCE',subtitle:'Product Manager, Digital Sales & CX — May 2019 → Jan 2022',body:'Led digital sales & customer experience for a major Nordic insurer. Drove +20% signups, +30% marketing consent, and 10% online sales growth through systematic A/B testing and funnel optimization.',tags:['+20% Signups','+10% Sales','CX Design','Funnel Optimization','A/B Testing']},
+  bjj:{title:'🥋 BRAZILIAN JIU-JITSU',subtitle:'The Gentle Art',body:'Training BJJ — the art of human chess on the mats. Problem-solving with your body, learning patience, and getting comfortable being uncomfortable. The best metaphor for product work there is.',tags:['Discipline','Problem Solving','Resilience'],hobby:true},
+  reading:{title:'📚 READING',subtitle:'Never stop learning',body:'Constantly reading — product management, strategy, psychology, sci-fi, and everything in between. Books shape how I think about building products and leading teams.',tags:['Product Books','Strategy','Psychology','Sci-Fi'],hobby:true},
+  strategy:{title:'🎮 STRATEGY GAMES',subtitle:'Systems thinking playground',body:'Playing strategy games — from grand strategy to tactical puzzles. It\'s how I unwind while still exercising the systems thinking and decision-making muscles that matter in product work.',tags:['Systems Thinking','Decision Making','Optimization'],hobby:true},
+  tech:{title:'🔧 TECH TINKERING',subtitle:'Building things for fun',body:'Tinkering on personal technical projects — experimenting with new tools, building small apps, exploring AI/ML, and staying hands-on with the technology side. A PM who codes is a PM who understands.',tags:['Side Projects','AI Experiments','Full-Stack','Prototyping'],hobby:true},
+  projects:{title:'🚧 SIDE PROJECTS',subtitle:'What I\'m building in my spare time',body:'<strong style="color:#f0c020">📝 Notes App for Hard-to-Focus People</strong><br><br>Building a notes app designed for people who struggle to focus — minimal distractions, smart structure, and AI-assisted organization. The real goal is twofold: learning to code properly, and exploring how far AI-enabled development can take a product-minded person.<br><br>It\'s a playground for learning full-stack development, prompt engineering, and understanding what it actually takes to ship software — not just spec it.',tags:['Learning to Code','AI-Enabled Dev','React','Side Project','Ship It'],project:true},
+  contact:{title:'📬 CONTACT ME',subtitle:'Let\'s connect!',body:'Want to chat about product, collaborate, or just say hi?<br><br>📧 <a href="mailto:matias.korpisalo@outlook.com">matias.korpisalo@outlook.com</a>',tags:['Open to opportunities','Coffee chats','Collaboration'],contact:true}
 };
 
-function resize(){
-  W=window.innerWidth;H=window.innerHeight;
-  scale=Math.max(2,Math.floor(Math.min(W/(20*TILE),H/(15*TILE))));
-  C.width=W;C.height=H;
-  X.imageSmoothingEnabled=false;
-}
+const peekData={
+  aibidia:{line1:'AIBIDIA',line2:'PM · Enterprise SaaS · 2025→'},alicent:{line1:'ALICENT',line2:'Senior PM · AI Startup · 0→1'},
+  nordea:{line1:'NORDEA',line2:'Senior PM · BNPL · FinTech'},if_insurance:{line1:'IF INSURANCE',line2:'PM · Digital Sales · +20% Growth'},
+  bjj:{line1:'BJJ DOJO',line2:'Discipline · Problem Solving'},reading:{line1:'READING NOOK',line2:'Product · Strategy · Sci-Fi'},
+  strategy:{line1:'GAME DEN',line2:'Grand Strategy · Systems'},tech:{line1:'TECH WORKSHOP',line2:'Side Projects · AI · Code'},
+  projects:{line1:'SIDE PROJECTS',line2:'Notes App · Learning to Code'},contact:{line1:'CONTACT',line2:'matias.korpisalo@outlook.com'}
+};
+
+function resize(){W=window.innerWidth;H=window.innerHeight;scale=Math.max(2,Math.floor(Math.min(W/(22*TILE),H/(16*TILE))));C.width=W;C.height=H;X.imageSmoothingEnabled=false}
 
 function drawTile(tx,ty,sx,sy){
-  const t=map[ty][tx];
-  let col=TC[t]||'#3a8a3a';
-  if(t===T.GRASS){
-    const v=((tx*7+ty*13)%3);
-    col=v===0?'#3a8a3a':v===1?'#3d8d3d':'#378737';
-  }
-  X.fillStyle=col;
-  X.fillRect(sx,sy,TILE*scale,TILE*scale);
-  const s=scale;
-
-  if(t===T.TREE){
-    X.fillStyle='#5a3a1a';X.fillRect(sx+6*s,sy+10*s,4*s,6*s);
-    X.fillStyle='#2a7a2a';X.fillRect(sx+2*s,sy+2*s,12*s,10*s);
-    X.fillStyle='#35903a';X.fillRect(sx+4*s,sy+1*s,8*s,4*s);
-  } else if(t===T.WATER){
-    const sh=((Date.now()/500+tx+ty)%3)|0;
-    if(sh===0){X.fillStyle='rgba(255,255,255,0.15)';X.fillRect(sx+4*s,sy+6*s,3*s,1*s);}
-    if(sh===1){X.fillStyle='rgba(255,255,255,0.1)';X.fillRect(sx+8*s,sy+3*s,4*s,1*s);}
-  } else if(t===T.DESK){
-    X.fillStyle='#a08060';X.fillRect(sx+1*s,sy+2*s,14*s,12*s);
-    X.fillStyle='#8a6a48';X.fillRect(sx+2*s,sy+13*s,3*s,3*s);X.fillRect(sx+11*s,sy+13*s,3*s,3*s);
-  } else if(t===T.PC){
-    X.fillStyle='#222';X.fillRect(sx+3*s,sy+2*s,10*s,8*s);
-    X.fillStyle='#4488cc';X.fillRect(sx+4*s,sy+3*s,8*s,6*s);
-    X.fillStyle='#333';X.fillRect(sx+6*s,sy+10*s,4*s,2*s);X.fillRect(sx+4*s,sy+12*s,8*s,2*s);
-  } else if(t===T.DOOR){
-    X.fillStyle='#d4a040';X.fillRect(sx+2*s,sy+2*s,12*s,14*s);
-    X.fillStyle='#b08030';X.fillRect(sx+3*s,sy+3*s,4*s,5*s);X.fillRect(sx+9*s,sy+3*s,4*s,5*s);
-  } else if(t===T.MAT){
-    X.fillStyle='#cc3333';X.fillRect(sx+1*s,sy+1*s,14*s,14*s);
-    X.fillStyle='#dd5555';X.fillRect(sx+2*s,sy+2*s,12*s,12*s);
-  } else if(t===T.FLOWER){
-    X.fillStyle='#3a8a3a';X.fillRect(sx,sy,TILE*s,TILE*s);
-    const fc=['#ff6b8a','#ffaa40','#ff5555','#ff80c0'];
-    X.fillStyle=fc[(tx+ty)%4];X.fillRect(sx+6*s,sy+5*s,4*s,4*s);
-    X.fillStyle='#ffee44';X.fillRect(sx+7*s,sy+6*s,2*s,2*s);
-    X.fillStyle='#2a7a2a';X.fillRect(sx+7*s,sy+9*s,2*s,4*s);
-  } else if(t===T.FENCE){
-    X.fillStyle='#3a8a3a';X.fillRect(sx,sy,TILE*s,TILE*s);
-    X.fillStyle='#b09060';X.fillRect(sx+2*s,sy+4*s,2*s,12*s);X.fillRect(sx+12*s,sy+4*s,2*s,12*s);
-    X.fillRect(sx,sy+6*s,16*s,2*s);X.fillRect(sx,sy+12*s,16*s,2*s);
-  } else if(t===T.BOOKSHELF){
-    X.fillStyle='#8a6a40';X.fillRect(sx+1*s,sy+1*s,14*s,14*s);
-    const bc=['#c44','#48a','#4a4','#a84','#84a'];
-    for(let i=0;i<4;i++){X.fillStyle=bc[i%5];X.fillRect(sx+(2+i*3)*s,sy+2*s,2*s,5*s);}
-    for(let i=0;i<4;i++){X.fillStyle=bc[(i+2)%5];X.fillRect(sx+(2+i*3)*s,sy+9*s,2*s,5*s);}
-  } else if(t===T.BRIDGE){
-    X.fillStyle='#b09060';X.fillRect(sx,sy,16*s,16*s);
-    X.fillStyle='#907040';X.fillRect(sx,sy,16*s,2*s);X.fillRect(sx,sy+14*s,16*s,2*s);
-  } else if(t===T.SAND){
-    X.fillStyle=((tx*3+ty*7)%2)?'#e8d8a0':'#e0d098';
-    X.fillRect(sx,sy,TILE*s,TILE*s);
-  } else if(t===T.TATAMI){
-    X.fillStyle='#8aaa60';X.fillRect(sx,sy,16*s,16*s);
-    X.fillStyle='#7a9a50';X.fillRect(sx+7*s,sy,2*s,16*s);X.fillRect(sx,sy+7*s,16*s,2*s);
-  } else if(t===T.STONE){
-    X.fillStyle='#3a8a3a';X.fillRect(sx,sy,16*s,16*s);
-    X.fillStyle='#889';X.fillRect(sx+3*s,sy+4*s,10*s,8*s);
-    X.fillStyle='#99a';X.fillRect(sx+4*s,sy+5*s,8*s,5*s);
-  } else if(t===T.WALL){
-    X.fillStyle='#7a6a5a';X.fillRect(sx,sy,16*s,16*s);
-    X.fillStyle='#6a5a4a';
-    X.fillRect(sx+1*s,sy+1*s,6*s,7*s);X.fillRect(sx+9*s,sy+1*s,6*s,7*s);
-    X.fillRect(sx+1*s,sy+9*s,6*s,6*s);X.fillRect(sx+9*s,sy+9*s,6*s,6*s);
-  } else if(t===T.MAILBOX){
-    X.fillStyle='#3a8a3a';X.fillRect(sx,sy,16*s,16*s);
-    // Post
-    X.fillStyle='#8a7050';X.fillRect(sx+7*s,sy+7*s,3*s,9*s);
-    // Box
-    X.fillStyle='#3366cc';X.fillRect(sx+3*s,sy+2*s,10*s,7*s);
-    X.fillStyle='#4488ee';X.fillRect(sx+4*s,sy+3*s,8*s,5*s);
-    // Mail slot
-    X.fillStyle='#222';X.fillRect(sx+5*s,sy+5*s,6*s,1*s);
-    // Flag
-    X.fillStyle='#dd3333';X.fillRect(sx+13*s,sy+2*s,2*s,4*s);
-  }
+  const t=map[ty][tx],s=scale;
+  if(t===T.GRASS||t===T.FLOWER||t===T.STONE||t===T.LAMP||t===T.BENCH||t===T.BUSH||t===T.SIGN_POST||t===T.MAILBOX){
+    const v=((tx*7+ty*13)%3);X.fillStyle=v===0?'#3a8a3a':v===1?'#3d8d3d':'#378737';X.fillRect(sx,sy,TILE*s,TILE*s);
+  }else if(t===T.SAND){X.fillStyle=((tx*3+ty*7)%2)?'#e8d8a0':'#e0d098';X.fillRect(sx,sy,TILE*s,TILE*s);
+  }else{X.fillStyle='#3a8a3a';X.fillRect(sx,sy,TILE*s,TILE*s);
+    const tc={[T.PATH]:'#c8b898',[T.WATER]:'#2266aa',[T.FLOOR]:'#d4c4a0',[T.WALL]:'#6a5a4a',[T.DOOR]:'#c08030',[T.TREE]:'#2a6a2a',[T.DESK]:'#8a7050',[T.MAT]:'#aa3030',[T.FENCE]:'#9a8060',[T.BRIDGE]:'#a08050',[T.TATAMI]:'#8aaa60',[T.BOOKSHELF]:'#6a4a30',[T.PC]:'#334'};
+    if(tc[t]){X.fillStyle=tc[t];X.fillRect(sx,sy,TILE*s,TILE*s)}}
+  if(t===T.TREE){X.fillStyle='#5a3a1a';X.fillRect(sx+6*s,sy+10*s,4*s,6*s);X.fillStyle='#2a7a2a';X.fillRect(sx+2*s,sy+2*s,12*s,10*s);X.fillStyle='#35903a';X.fillRect(sx+4*s,sy+1*s,8*s,4*s);}
+  else if(t===T.WATER||t===T.POND_LILY){X.fillStyle='#2266aa';X.fillRect(sx,sy,TILE*s,TILE*s);const sh=((Date.now()/500+tx+ty)%3)|0;if(sh===0){X.fillStyle='rgba(255,255,255,0.15)';X.fillRect(sx+4*s,sy+6*s,3*s,1*s)}if(sh===1){X.fillStyle='rgba(255,255,255,0.1)';X.fillRect(sx+8*s,sy+3*s,4*s,1*s)}if(t===T.POND_LILY){X.fillStyle='#3a9a3a';X.fillRect(sx+5*s,sy+5*s,6*s,5*s);X.fillStyle='#ff88aa';X.fillRect(sx+7*s,sy+4*s,3*s,3*s)}}
+  else if(t===T.DESK){X.fillStyle='#a08060';X.fillRect(sx+1*s,sy+2*s,14*s,12*s);X.fillStyle='#8a6a48';X.fillRect(sx+2*s,sy+13*s,3*s,3*s);X.fillRect(sx+11*s,sy+13*s,3*s,3*s)}
+  else if(t===T.PC){X.fillStyle='#222';X.fillRect(sx+3*s,sy+2*s,10*s,8*s);X.fillStyle='#4488cc';X.fillRect(sx+4*s,sy+3*s,8*s,6*s);X.fillStyle='#333';X.fillRect(sx+6*s,sy+10*s,4*s,2*s);X.fillRect(sx+4*s,sy+12*s,8*s,2*s)}
+  else if(t===T.DOOR){X.fillStyle='#d4a040';X.fillRect(sx+2*s,sy+2*s,12*s,14*s);X.fillStyle='#b08030';X.fillRect(sx+3*s,sy+3*s,4*s,5*s);X.fillRect(sx+9*s,sy+3*s,4*s,5*s)}
+  else if(t===T.MAT){X.fillStyle='#cc3333';X.fillRect(sx+1*s,sy+1*s,14*s,14*s);X.fillStyle='#dd5555';X.fillRect(sx+2*s,sy+2*s,12*s,12*s)}
+  else if(t===T.FLOWER){const fc=['#ff6b8a','#ffaa40','#ff5555','#ff80c0','#aa88ff'];X.fillStyle=fc[(tx+ty)%5];X.fillRect(sx+6*s,sy+5*s,4*s,4*s);X.fillStyle='#ffee44';X.fillRect(sx+7*s,sy+6*s,2*s,2*s);X.fillStyle='#2a7a2a';X.fillRect(sx+7*s,sy+9*s,2*s,4*s)}
+  else if(t===T.FENCE){X.fillStyle='#b09060';X.fillRect(sx+2*s,sy+4*s,2*s,12*s);X.fillRect(sx+12*s,sy+4*s,2*s,12*s);X.fillRect(sx,sy+6*s,16*s,2*s);X.fillRect(sx,sy+12*s,16*s,2*s)}
+  else if(t===T.BOOKSHELF){X.fillStyle='#8a6a40';X.fillRect(sx+1*s,sy+1*s,14*s,14*s);const bc=['#c44','#48a','#4a4','#a84','#84a'];for(let i=0;i<4;i++){X.fillStyle=bc[i%5];X.fillRect(sx+(2+i*3)*s,sy+2*s,2*s,5*s)}for(let i=0;i<4;i++){X.fillStyle=bc[(i+2)%5];X.fillRect(sx+(2+i*3)*s,sy+9*s,2*s,5*s)}}
+  else if(t===T.BRIDGE){X.fillStyle='#b09060';X.fillRect(sx,sy,16*s,16*s);X.fillStyle='#907040';X.fillRect(sx,sy,16*s,2*s);X.fillRect(sx,sy+14*s,16*s,2*s)}
+  else if(t===T.TATAMI){X.fillStyle='#7a9a50';X.fillRect(sx+7*s,sy,2*s,16*s);X.fillRect(sx,sy+7*s,16*s,2*s)}
+  else if(t===T.STONE){X.fillStyle='#889';X.fillRect(sx+3*s,sy+4*s,10*s,8*s);X.fillStyle='#99a';X.fillRect(sx+4*s,sy+5*s,8*s,5*s)}
+  else if(t===T.WALL){X.fillStyle='#7a6a5a';X.fillRect(sx,sy,16*s,16*s);X.fillStyle='#6a5a4a';X.fillRect(sx+1*s,sy+1*s,6*s,7*s);X.fillRect(sx+9*s,sy+1*s,6*s,7*s);X.fillRect(sx+1*s,sy+9*s,6*s,6*s);X.fillRect(sx+9*s,sy+9*s,6*s,6*s)}
+  else if(t===T.LAMP){X.fillStyle='#888';X.fillRect(sx+7*s,sy+4*s,2*s,12*s);const glow=(Math.sin(Date.now()/800+tx)*0.3+0.7);X.fillStyle=`rgba(255,230,150,${glow})`;X.fillRect(sx+4*s,sy+1*s,8*s,5*s);X.fillStyle=`rgba(255,220,100,${glow*0.15})`;X.beginPath();X.arc(sx+8*s,sy+4*s,12*s,0,Math.PI*2);X.fill()}
+  else if(t===T.BENCH){X.fillStyle='#8a6a40';X.fillRect(sx+1*s,sy+5*s,14*s,4*s);X.fillStyle='#6a4a28';X.fillRect(sx+2*s,sy+9*s,3*s,5*s);X.fillRect(sx+11*s,sy+9*s,3*s,5*s);X.fillStyle='#7a5a38';X.fillRect(sx+1*s,sy+3*s,14*s,2*s)}
+  else if(t===T.BUSH){X.fillStyle='#2a7a2a';X.fillRect(sx+2*s,sy+4*s,12*s,10*s);X.fillStyle='#35903a';X.fillRect(sx+3*s,sy+3*s,10*s,4*s)}
+  else if(t===T.SIGN_POST){X.fillStyle='#8a7050';X.fillRect(sx+7*s,sy+6*s,2*s,10*s);X.fillStyle='#d4a040';X.fillRect(sx+2*s,sy+2*s,12*s,6*s);X.fillStyle='#b08030';X.fillRect(sx+3*s,sy+3*s,10*s,4*s)}
+  else if(t===T.MAILBOX){X.fillStyle='#8a7050';X.fillRect(sx+7*s,sy+7*s,3*s,9*s);X.fillStyle='#3366cc';X.fillRect(sx+3*s,sy+2*s,10*s,7*s);X.fillStyle='#4488ee';X.fillRect(sx+4*s,sy+3*s,8*s,5*s);X.fillStyle='#222';X.fillRect(sx+5*s,sy+5*s,6*s,1*s);X.fillStyle='#dd3333';X.fillRect(sx+13*s,sy+2*s,2*s,4*s)}
+  else if(t===T.PATH){if((tx+ty)%7===0){X.fillStyle='rgba(0,0,0,0.06)';X.fillRect(sx+2*s,sy+2*s,4*s,4*s)}}
 }
 
-// Floating beacons
 function drawBeacons(){
-  const s=scale;
-  const t=Date.now();
+  const s=scale,now=Date.now();
   beacons.forEach(b=>{
-    const sx=(b.x*TILE-CAM.x)*scale;
-    const sy=(b.y*TILE-CAM.y)*scale;
-    if(sx<-100||sx>W+100||sy<-100||sy>H+100) return;
-
-    const hover=Math.sin(t/400+b.x)*4*s;
-    const pulse=(Math.sin(t/300+b.y)*0.15+0.85);
-
-    // Distance to player
-    const dx=P.x-b.x, dy=P.y-b.y;
-    const dist=Math.sqrt(dx*dx+dy*dy);
-    const nearby=dist<6;
-
-    // Glow ring on ground
-    const glowR=12*s*pulse;
-    const col=b.type==='work'?'rgba(120,180,255,':'rgba(120,220,120,';
-    const colC=b.type==='contact'?'rgba(220,120,220,':col;
-    X.beginPath();
-    X.arc(sx,sy+8*s,glowR,0,Math.PI*2);
-    X.fillStyle=(b.type==='contact'?colC:col)+(nearby?'0.18)':'0.08)');
-    X.fill();
-
-    // Floating arrow/chevron
+    const sx=(b.x*TILE-CAM.x)*scale,sy=(b.y*TILE-CAM.y)*scale;
+    if(sx<-200||sx>W+200||sy<-200||sy>H+200)return;
+    const hover=Math.sin(now/400+b.x)*4*s,pulse=(Math.sin(now/300+b.y)*0.15+0.85);
+    const dx=P.x-b.x,dy=P.y-b.y,dist=Math.sqrt(dx*dx+dy*dy);
+    const nearby=dist<8,veryClose=dist<4;
+    const colMap={work:'120,180,255',hobby:'120,220,120',project:'240,192,32',contact:'220,120,220'};
+    const col=colMap[b.type]||'120,180,255';
+    const aColMap={work:'#7cb8ff',hobby:'#7cda7c',project:'#f0c020',contact:'#da7cda'};
+    const aCol=aColMap[b.type]||'#7cb8ff';
+    const isV=visited[b.id];
+    const glowR=(nearby?16:12)*s*pulse;
+    X.beginPath();X.arc(sx,sy+8*s,glowR,0,Math.PI*2);X.fillStyle=`rgba(${col},${nearby?0.22:0.08})`;X.fill();
     const arrowY=sy-18*s+hover;
-    const aCol=b.type==='work'?'#7cb8ff':b.type==='contact'?'#da7cda':'#7cda7c';
-    X.globalAlpha=nearby?1:0.5+Math.sin(t/500)*0.2;
-
-    // Down arrow
-    X.fillStyle=aCol;
-    X.beginPath();
-    X.moveTo(sx-5*s,arrowY);
-    X.lineTo(sx+5*s,arrowY);
-    X.lineTo(sx,arrowY+5*s);
-    X.closePath();
-    X.fill();
-
-    // Second smaller arrow
-    X.beginPath();
-    X.moveTo(sx-3*s,arrowY-4*s);
-    X.lineTo(sx+3*s,arrowY-4*s);
-    X.lineTo(sx,arrowY-1*s);
-    X.closePath();
-    X.fill();
-
+    X.globalAlpha=nearby?1:0.4+Math.sin(now/500)*0.2;
+    X.fillStyle=isV?'#888':aCol;
+    X.beginPath();X.moveTo(sx-5*s,arrowY);X.lineTo(sx+5*s,arrowY);X.lineTo(sx,arrowY+5*s);X.closePath();X.fill();
+    X.beginPath();X.moveTo(sx-3*s,arrowY-4*s);X.lineTo(sx+3*s,arrowY-4*s);X.lineTo(sx,arrowY-1*s);X.closePath();X.fill();
+    if(isV){X.fillStyle='#4f4';X.font=`${4*s}px 'Press Start 2P'`;X.textAlign='center';X.fillText('✓',sx,arrowY-2*s)}
     X.globalAlpha=1;
-
-    // Label when nearby
-    if(nearby){
-      const info=popups[b.id];
-      if(info){
-        const label=info.title;
-        X.font=`${3*s}px 'Press Start 2P'`;
-        const tw=X.measureText(label).width;
-        X.fillStyle='rgba(0,0,0,0.8)';
-        X.fillRect(sx-tw/2-4*s,arrowY-16*s,tw+8*s,8*s);
-        X.strokeStyle=aCol;
-        X.lineWidth=1;
-        X.strokeRect(sx-tw/2-4*s,arrowY-16*s,tw+8*s,8*s);
-        X.fillStyle=aCol;
-        X.textAlign='center';
-        X.fillText(label,sx,arrowY-10*s);
-        X.textAlign='left';
-
-        // "Enter" hint
-        X.font=`${2*s}px 'Press Start 2P'`;
-        X.fillStyle='#aaa';
-        X.textAlign='center';
-        X.fillText('WALK CLOSER',sx,arrowY-5*s+16*s+hover);
-        X.textAlign='left';
-      }
-    }
-  });
-}
-
-function drawPlayer(sx,sy){
-  const s=scale;
-  const bob=P.moving?Math.sin(Date.now()/100)*1.5*s:0;
-  const py=sy+bob;
-  X.fillStyle='rgba(0,0,0,0.2)';X.fillRect(sx+2*s,sy+13*s,12*s,3*s);
-  X.fillStyle='#4a3520';X.fillRect(sx+4*s,py+0*s,8*s,3*s);
-  if(P.dir!==3) X.fillRect(sx+4*s,py+1*s,9*s,2*s);
-  X.fillStyle='#f5c040';X.fillRect(sx+4*s,py+2*s,8*s,5*s);
-  if(P.dir===0||P.dir===1||P.dir===2){
-    X.fillStyle='#222';
-    if(P.dir===1){X.fillRect(sx+5*s,py+4*s,2*s,1*s);X.fillRect(sx+9*s,py+4*s,1*s,1*s);}
-    else if(P.dir===2){X.fillRect(sx+6*s,py+4*s,1*s,1*s);X.fillRect(sx+9*s,py+4*s,2*s,1*s);}
-    else{X.fillRect(sx+5*s,py+4*s,2*s,1*s);X.fillRect(sx+9*s,py+4*s,2*s,1*s);}
-    X.fillStyle='#222';X.fillRect(sx+6*s,py+6*s,4*s,1*s);
-  }
-  X.fillStyle='#1e5aa8';X.fillRect(sx+3*s,py+7*s,10*s,5*s);
-  const armSwing=P.moving?Math.sin(Date.now()/100)*2*s:0;
-  X.fillStyle='#f5c040';
-  X.fillRect(sx+1*s,py+(8+armSwing/s)*s,3*s,3*s);
-  X.fillRect(sx+12*s,py+(8-armSwing/s)*s,3*s,3*s);
-  const legSwing=P.moving?Math.sin(Date.now()/100)*1.5:0;
-  X.fillStyle='#444';
-  X.fillRect(sx+4*s,py+12*s,4*s,(3+legSwing)*s);
-  X.fillRect(sx+8*s,py+12*s,4*s,(3-legSwing)*s);
-  // Name tag
-  X.fillStyle='rgba(0,0,0,0.7)';X.fillRect(sx-4*s,py-8*s,24*s,7*s);
-  X.fillStyle='#4f4';X.fillRect(sx-2*s,py-5*s,3*s,3*s);
-  X.fillStyle='#fff';X.font=`${3*s}px 'Press Start 2P'`;
-  X.fillText('Matias',sx+3*s,py-3*s);
-}
-
-const zoneLabels=[
-  {x:9,y:13,text:'AIBIDIA',col:'#7cb8ff'},
-  {x:27,y:13,text:'ALICENT',col:'#ffaa55'},
-  {x:9,y:24,text:'NORDEA',col:'#55ddcc'},
-  {x:27,y:24,text:'IF INS.',col:'#ffee55'},
-  {x:9,y:2,text:'🥋 BJJ',col:'#ff6666'},
-  {x:35,y:25,text:'📚 BOOKS',col:'#aaddff'},
-  {x:16,y:25,text:'🎮 GAMES',col:'#aaffaa'},
-  {x:35,y:11,text:'🔧 TECH',col:'#ffcc66'},
-  {x:29,y:28,text:'📬 CONTACT',col:'#da7cda'},
-];
-
-function drawLabels(){
-  const s=scale;
-  zoneLabels.forEach(l=>{
-    const sx=(l.x*TILE-CAM.x)*scale;
-    const sy=(l.y*TILE-CAM.y)*scale;
-    if(sx>-100*s&&sx<W+100&&sy>-50&&sy<H+50){
-      X.fillStyle='rgba(0,0,0,0.55)';
-      const tw=l.text.length*3.5*s+8*s;
-      X.fillRect(sx-tw/2,sy-3*s,tw,8*s);
-      X.fillStyle=l.col;
-      X.font=`${3*s}px 'Press Start 2P'`;
-      X.textAlign='center';
-      X.fillText(l.text,sx,sy+2*s);
+    const peek=peekData[b.id];
+    if(nearby&&peek){
+      X.font=`${3*s}px 'Press Start 2P'`;const tw1=X.measureText(peek.line1).width;
+      X.font=`${2*s}px 'Press Start 2P'`;const tw2=X.measureText(peek.line2).width;
+      const tw=Math.max(tw1,tw2),bx=sx-tw/2-6*s,by=arrowY-28*s,bw=tw+12*s,bh=18*s;
+      X.fillStyle='rgba(0,0,0,0.88)';
+      X.beginPath();X.moveTo(bx+3*s,by);X.lineTo(bx+bw-3*s,by);X.quadraticCurveTo(bx+bw,by,bx+bw,by+3*s);X.lineTo(bx+bw,by+bh-3*s);X.quadraticCurveTo(bx+bw,by+bh,bx+bw-3*s,by+bh);X.lineTo(bx+3*s,by+bh);X.quadraticCurveTo(bx,by+bh,bx,by+bh-3*s);X.lineTo(bx,by+3*s);X.quadraticCurveTo(bx,by,bx+3*s,by);X.fill();
+      X.strokeStyle=aCol;X.lineWidth=1.5;
+      X.beginPath();X.moveTo(bx+3*s,by);X.lineTo(bx+bw-3*s,by);X.quadraticCurveTo(bx+bw,by,bx+bw,by+3*s);X.lineTo(bx+bw,by+bh-3*s);X.quadraticCurveTo(bx+bw,by+bh,bx+bw-3*s,by+bh);X.lineTo(bx+3*s,by+bh);X.quadraticCurveTo(bx,by+bh,bx,by+bh-3*s);X.lineTo(bx,by+3*s);X.quadraticCurveTo(bx,by,bx+3*s,by);X.stroke();
+      X.fillStyle='rgba(0,0,0,0.88)';X.beginPath();X.moveTo(sx-4*s,by+bh);X.lineTo(sx+4*s,by+bh);X.lineTo(sx,by+bh+4*s);X.closePath();X.fill();
+      X.strokeStyle=aCol;X.beginPath();X.moveTo(sx-4*s,by+bh);X.lineTo(sx,by+bh+4*s);X.lineTo(sx+4*s,by+bh);X.stroke();
+      X.textAlign='center';X.fillStyle=aCol;X.font=`${3*s}px 'Press Start 2P'`;X.fillText(peek.line1,sx,by+7*s);
+      X.fillStyle='#aaa';X.font=`${2*s}px 'Press Start 2P'`;X.fillText(peek.line2,sx,by+13*s);
+      if(veryClose){X.fillStyle='#fff';X.font=`${1.5*s}px 'Press Start 2P'`;X.fillText('▶ WALK IN TO LEARN MORE',sx,by+bh+10*s+hover)}
       X.textAlign='left';
     }
   });
 }
 
+function drawPlayer(sx,sy){
+  const s=scale,bob=P.moving?Math.sin(Date.now()/100)*1.5*s:0,py=sy+bob;
+  X.fillStyle='rgba(0,0,0,0.2)';X.fillRect(sx+2*s,sy+13*s,12*s,3*s);
+  X.fillStyle='#4a3520';X.fillRect(sx+4*s,py+0*s,8*s,3*s);if(P.dir!==3)X.fillRect(sx+4*s,py+1*s,9*s,2*s);
+  X.fillStyle='#f5c040';X.fillRect(sx+4*s,py+2*s,8*s,5*s);
+  if(P.dir!==3){X.fillStyle='#222';if(P.dir===1){X.fillRect(sx+5*s,py+4*s,2*s,1*s);X.fillRect(sx+9*s,py+4*s,1*s,1*s)}else if(P.dir===2){X.fillRect(sx+6*s,py+4*s,1*s,1*s);X.fillRect(sx+9*s,py+4*s,2*s,1*s)}else{X.fillRect(sx+5*s,py+4*s,2*s,1*s);X.fillRect(sx+9*s,py+4*s,2*s,1*s)}X.fillStyle='#222';X.fillRect(sx+6*s,py+6*s,4*s,1*s)}
+  X.fillStyle='#1e5aa8';X.fillRect(sx+3*s,py+7*s,10*s,5*s);
+  const arm=P.moving?Math.sin(Date.now()/100)*2*s:0;
+  X.fillStyle='#f5c040';X.fillRect(sx+1*s,py+(8+arm/s)*s,3*s,3*s);X.fillRect(sx+12*s,py+(8-arm/s)*s,3*s,3*s);
+  const leg=P.moving?Math.sin(Date.now()/100)*1.5:0;
+  X.fillStyle='#444';X.fillRect(sx+4*s,py+12*s,4*s,(3+leg)*s);X.fillRect(sx+8*s,py+12*s,4*s,(3-leg)*s);
+  X.fillStyle='rgba(0,0,0,0.7)';X.fillRect(sx-4*s,py-8*s,24*s,7*s);
+  X.fillStyle='#4f4';X.fillRect(sx-2*s,py-5*s,3*s,3*s);
+  X.fillStyle='#fff';X.font=`${3*s}px 'Press Start 2P'`;X.fillText('Matias',sx+3*s,py-3*s);
+}
+
+function drawMinimap(){
+  const mw=160,mh=120,mx=mw/COLS,my=mh/ROWS;
+  MX.fillStyle='#1a2a1a';MX.fillRect(0,0,mw,mh);
+  for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
+    const t=map[y][x];let c='#2a5a2a';
+    if(t===T.PATH||t===T.BRIDGE)c='#a09878';else if(t===T.WATER||t===T.POND_LILY)c='#2266aa';
+    else if(t===T.WALL)c='#6a5a4a';else if(t===T.FLOOR||t===T.DOOR)c='#c4b490';
+    else if(t===T.TREE)c='#1a5a1a';else if(t===T.TATAMI||t===T.MAT)c='#8a6a50';
+    else if(t===T.SAND)c='#d8c890';else if(t===T.BUSH)c='#1a6a1a';
+    MX.fillStyle=c;MX.fillRect(x*mx,y*my,mx+0.5,my+0.5);
+  }
+  beacons.forEach(b=>{
+    const colMap={work:'#7cb8ff',hobby:'#7cda7c',project:'#f0c020',contact:'#da7cda'};
+    MX.fillStyle=visited[b.id]?'#4f4':colMap[b.type]||'#fff';MX.fillRect(b.x*mx-1.5,b.y*my-1.5,4,4);
+  });
+  // NPC dots
+  npcs.forEach(n=>{MX.fillStyle='#88ccff';MX.fillRect(n.x*mx-1,n.y*my-1,3,3)});
+  if(Math.sin(Date.now()/200)>0){MX.fillStyle='#ff4444';MX.fillRect(P.x*mx-2,P.y*my-2,5,5)}
+  MX.fillStyle='#ff4444';MX.fillRect(P.x*mx-1.5,P.y*my-1.5,4,4);
+  const vx=(CAM.x/TILE)*mx,vy=(CAM.y/TILE)*my,vw=(W/(scale*TILE))*mx,vh=(H/(scale*TILE))*my;
+  MX.strokeStyle='rgba(255,255,255,0.5)';MX.lineWidth=1;MX.strokeRect(vx,vy,vw,vh);
+}
+
 function checkZones(){
-  if(zoneCooldown) return;
+  if(zoneCooldown||npcBubbleOpen)return;
   const px=Math.floor(P.x),py=Math.floor(P.y);
   let inZone=null;
-  for(const z of zones){
-    if(py>=z.y-1&&py<=z.y+1&&px>=z.x1-1&&px<=z.x2+1){inZone=z.id;break;}
-  }
-  if(!inZone){
-    const t=map[py]?.[px];
-    if(t===T.DOOR){
-      for(const z of zones){
-        if(Math.abs(py-z.y)<=2&&px>=z.x1-2&&px<=z.x2+2){inZone=z.id;break;}
-      }
-    }
-  }
-  if(!inZone){lastZoneId=null;return;}
-  if(inZone!==lastZoneId){lastZoneId=inZone;showPopup(inZone);}
+  for(const z of zones){if(py>=z.y-1&&py<=z.y+1&&px>=z.x1-1&&px<=z.x2+1){inZone=z.id;break}}
+  if(!inZone){const t=map[py]?.[px];if(t===T.DOOR){for(const z of zones){if(Math.abs(py-z.y)<=2&&px>=z.x1-2&&px<=z.x2+2){inZone=z.id;break}}}}
+  if(!inZone){lastZoneId=null;return}
+  if(inZone!==lastZoneId){lastZoneId=inZone;showPopup(inZone)}
 }
 
 function showPopup(id){
-  if(popupOpen) return;
-  const d=popups[id];if(!d) return;
-  popupOpen=true;
-  const tagClass=d.hobby?'tag hobby-tag':d.contact?'tag contact-tag':'tag';
+  if(popupOpen)return;const d=popups[id];if(!d)return;popupOpen=true;
+  if(!visited[id]){visited[id]=true;renderQuestLog();for(let i=0;i<15;i++) spawnP(P.x*TILE+Math.random()*32-16,P.y*TILE+Math.random()*16-8,'sparkle')}
+  const tc=d.hobby?'tag hobby-tag':d.contact?'tag contact-tag':d.project?'tag project-tag':'tag';
   let html=`<h2>${d.title}</h2><h3>${d.subtitle}</h3><p>${d.body}</p><div style="margin-top:10px">`;
-  d.tags.forEach(t=>html+=`<span class="${tagClass}">${t}</span>`);
+  d.tags.forEach(t=>html+=`<span class="${tc}">${t}</span>`);
   html+=`</div><div class="close-hint">Press ESC or click outside to close</div>`;
   document.getElementById('popup-content').innerHTML=html;
-  document.getElementById('popup').style.display='block';
-  document.getElementById('overlay').style.display='block';
+  const popup=document.getElementById('popup'),overlay=document.getElementById('overlay');
+  popup.style.display='block';overlay.style.display='block';
+  requestAnimationFrame(()=>{popup.classList.add('show');overlay.classList.add('show')});
 }
 
 function closePopup(){
-  popupOpen=false;zoneCooldown=true;
-  setTimeout(()=>{zoneCooldown=false;},500);
-  document.getElementById('popup').style.display='none';
-  document.getElementById('overlay').style.display='none';
+  popupOpen=false;zoneCooldown=true;setTimeout(()=>{zoneCooldown=false},500);
+  const popup=document.getElementById('popup'),overlay=document.getElementById('overlay');
+  popup.classList.remove('show');overlay.classList.remove('show');
+  setTimeout(()=>{popup.style.display='none';overlay.style.display='none'},200);
 }
 
-function canMove(nx,ny){
-  const tx=Math.floor(nx),ty=Math.floor(ny);
-  if(tx<0||tx>=COLS||ty<0||ty>=ROWS) return false;
-  return !solid.has(map[ty][tx]);
-}
+function canMove(nx,ny){const tx=Math.floor(nx),ty=Math.floor(ny);if(tx<0||tx>=COLS||ty<0||ty>=ROWS)return false;return !solid.has(map[ty][tx])}
 
 function update(dt){
-  if(popupOpen) return;
+  if(popupOpen)return;
   let dx=0,dy=0;
-  if(keys['ArrowLeft']||keys['a']||keys['mleft']){dx=-1;P.dir=1;}
-  if(keys['ArrowRight']||keys['d']||keys['mright']){dx=1;P.dir=2;}
-  if(keys['ArrowUp']||keys['w']||keys['mup']){dy=-1;P.dir=3;}
-  if(keys['ArrowDown']||keys['s']||keys['mdown']){dy=1;P.dir=0;}
+  if(keys['ArrowLeft']||keys['a']||keys['mleft']){dx=-1;P.dir=1}
+  if(keys['ArrowRight']||keys['d']||keys['mright']){dx=1;P.dir=2}
+  if(keys['ArrowUp']||keys['w']||keys['mup']){dy=-1;P.dir=3}
+  if(keys['ArrowDown']||keys['s']||keys['mdown']){dy=1;P.dir=0}
   P.moving=dx!==0||dy!==0;
-  const spd=4*dt;
-  const nx=P.x+dx*spd,ny=P.y+dy*spd;
-  if(dx!==0&&canMove(nx,P.y)) P.x=nx;
-  if(dy!==0&&canMove(P.x,ny)) P.y=ny;
-  if(P.moving) checkZones();
-  const targetCX=P.x*TILE-W/(2*scale)+8;
-  const targetCY=P.y*TILE-H/(2*scale)+8;
-  CAM.x+=(targetCX-CAM.x)*0.1;
-  CAM.y+=(targetCY-CAM.y)*0.1;
+  const spd=4*dt,nx=P.x+dx*spd,ny=P.y+dy*spd;
+  if(dx!==0&&canMove(nx,P.y))P.x=nx;
+  if(dy!==0&&canMove(P.x,ny))P.y=ny;
+  if(P.moving){checkZones();handleFootsteps();checkNPCs();checkNPCDistance();}
+  else{checkNPCDistance()}
+  updateNPCs(dt);handleAmbient(dt);updateParticles(dt);
+  const targetCX=P.x*TILE-W/(2*scale)+8,targetCY=P.y*TILE-H/(2*scale)+8;
+  CAM.x+=(targetCX-CAM.x)*0.1;CAM.y+=(targetCY-CAM.y)*0.1;
 }
 
 function draw(){
-  X.clearRect(0,0,W,H);
-  X.fillStyle='#1a1a2e';X.fillRect(0,0,W,H);
-  const startCol=Math.max(0,Math.floor(CAM.x/TILE)-1);
-  const endCol=Math.min(COLS,Math.ceil((CAM.x+W/scale)/TILE)+1);
-  const startRow=Math.max(0,Math.floor(CAM.y/TILE)-1);
-  const endRow=Math.min(ROWS,Math.ceil((CAM.y+H/scale)/TILE)+1);
-  for(let y=startRow;y<endRow;y++)
-    for(let x=startCol;x<endCol;x++)
-      drawTile(x,y,(x*TILE-CAM.x)*scale,(y*TILE-CAM.y)*scale);
-  drawLabels();
-  drawBeacons();
-  const psx=(P.x*TILE-CAM.x)*scale,psy=(P.y*TILE-CAM.y)*scale;
-  drawPlayer(psx,psy);
+  X.clearRect(0,0,W,H);X.fillStyle='#1a1a2e';X.fillRect(0,0,W,H);
+  const sc=Math.max(0,Math.floor(CAM.x/TILE)-1),ec=Math.min(COLS,Math.ceil((CAM.x+W/scale)/TILE)+1);
+  const sr=Math.max(0,Math.floor(CAM.y/TILE)-1),er=Math.min(ROWS,Math.ceil((CAM.y+H/scale)/TILE)+1);
+  for(let y=sr;y<er;y++) for(let x=sc;x<ec;x++) drawTile(x,y,(x*TILE-CAM.x)*scale,(y*TILE-CAM.y)*scale);
+  drawParticles();drawBeacons();
+  npcs.forEach(n=>drawNPC(n));
+  drawPlayer((P.x*TILE-CAM.x)*scale,(P.y*TILE-CAM.y)*scale);
+  drawMinimap();
 }
 
 let lastT=0;
-function loop(t){
-  const dt=Math.min((t-lastT)/1000,0.05);lastT=t;
-  if(gameStarted) update(dt);
-  draw();
-  requestAnimationFrame(loop);
-}
+function loop(t){const dt=Math.min((t-lastT)/1000,0.05);lastT=t;if(gameStarted)update(dt);draw();requestAnimationFrame(loop)}
 
 document.addEventListener('keydown',e=>{
   keys[e.key]=true;
-  if(e.key==='Escape') closePopup();
-  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+  if(e.key==='Escape'){if(npcBubbleOpen)closeNPCBubble();else closePopup()}
+  if(e.key==='q'||e.key==='Q')document.getElementById('questlog').classList.toggle('collapsed');
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();
 });
 document.addEventListener('keyup',e=>keys[e.key]=false);
+document.getElementById('ql-header').addEventListener('click',()=>{document.getElementById('questlog').classList.toggle('collapsed')});
 document.querySelectorAll('.d-btn').forEach(btn=>{
-  const dir=btn.dataset.dir,k='m'+dir;
-  btn.addEventListener('touchstart',e=>{e.preventDefault();keys[k]=true;});
-  btn.addEventListener('touchend',e=>{e.preventDefault();keys[k]=false;});
-  btn.addEventListener('mousedown',e=>{keys[k]=true;});
-  btn.addEventListener('mouseup',e=>{keys[k]=false;});
+  const k='m'+btn.dataset.dir;
+  btn.addEventListener('touchstart',e=>{e.preventDefault();keys[k]=true});
+  btn.addEventListener('touchend',e=>{e.preventDefault();keys[k]=false});
+  btn.addEventListener('mousedown',()=>{keys[k]=true});
+  btn.addEventListener('mouseup',()=>{keys[k]=false});
 });
 
 window.addEventListener('resize',resize);
-resize();buildMap();requestAnimationFrame(loop);
+resize();buildMap();renderQuestLog();requestAnimationFrame(loop);
 </script>
 </body>
 </html>
