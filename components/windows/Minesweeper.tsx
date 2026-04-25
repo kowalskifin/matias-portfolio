@@ -88,6 +88,9 @@ export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
   const [gameState, setGameState] = useState<GameState>("idle");
   const [flagCount, setFlagCount] = useState(0);
   const [time, setTime] = useState(0);
+  const [gamesStarted, setGamesStarted] = useState(1);
+  const [showNudge, setShowNudge] = useState(false);
+  const nudgeShownRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const stopTimer = useCallback(() => {
@@ -107,6 +110,14 @@ export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
     setGameState("idle");
     setFlagCount(0);
     setTime(0);
+    setGamesStarted((n) => {
+      const next = n + 1;
+      if (next === 3 && !nudgeShownRef.current) {
+        nudgeShownRef.current = true;
+        setShowNudge(true);
+      }
+      return next;
+    });
   };
 
   const checkWin = (b: Cell[][]) => {
@@ -157,7 +168,7 @@ export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
   const minesLeft = MINES - flagCount;
 
   return (
-    <div style={{ background: "#c0c0c0", padding: 8, height: "100%", display: "flex", flexDirection: "column", gap: 6, userSelect: "none" }}>
+    <div style={{ background: "#c0c0c0", padding: 8, height: "100%", display: "flex", flexDirection: "column", gap: 6, userSelect: "none", position: "relative" }}>
       {/* Info bar */}
       <div style={{ background: "#c0c0c0", border: "2px solid #808080", borderRight: "2px solid #fff", borderBottom: "2px solid #fff", padding: "4px 8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <SevenSeg value={Math.max(0, minesLeft)} />
@@ -188,6 +199,25 @@ export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
       </div>
 
       {/* Win/lose */}
+      {/* 3-game nudge */}
+      {showNudge && (
+        <div style={{ position: "absolute", bottom: 8, right: 8, width: 210, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #808080", borderBottom: "2px solid #808080", boxShadow: "2px 2px 0 #0a0a0a", zIndex: 10 }}>
+          <div style={{ background: "linear-gradient(to right, #000080, #1084d0)", color: "white", fontSize: 11, fontWeight: "bold", padding: "2px 6px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span>⏰ Still here?</span>
+            <span style={{ cursor: "pointer", fontSize: 9, fontWeight: "bold" }} onClick={() => setShowNudge(false)}>✕</span>
+          </div>
+          <div style={{ padding: "8px 10px", fontSize: 10, lineHeight: 1.5 }}>
+            You&apos;ve started 3 games of Minesweeper on a PM&apos;s portfolio.<br />
+            Respect.<br /><br />
+            Have you considered just hiring me instead?
+          </div>
+          <div style={{ display: "flex", gap: 6, justifyContent: "flex-end", padding: "4px 8px 8px" }}>
+            <button className="win98-btn" style={{ fontSize: 10, padding: "1px 8px" }} onClick={() => setShowNudge(false)}>Close</button>
+            <button className="win98-btn" style={{ fontSize: 10, padding: "1px 8px" }} onClick={() => { setShowNudge(false); onOpenContact(); }}>Open contact →</button>
+          </div>
+        </div>
+      )}
+
       {(gameState === "won" || gameState === "lost") && (
         <div style={{ background: "#c0c0c0", border: "2px solid #fff", borderRight: "2px solid #808080", borderBottom: "2px solid #808080", padding: "10px 12px", textAlign: "center", fontSize: 11 }}>
           {gameState === "won" ? (

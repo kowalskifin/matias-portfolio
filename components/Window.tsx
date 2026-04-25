@@ -191,6 +191,8 @@ export default function Window({
           flex: 1,
           overflow: noScroll ? "hidden" : "auto",
           minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         {children}

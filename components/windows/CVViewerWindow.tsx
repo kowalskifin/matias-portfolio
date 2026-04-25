@@ -17,7 +17,7 @@ export default function CVViewerWindow({ onClose }: CVViewerWindowProps) {
   const { name, title, contact, about, experience, projects, education, skills } = cvData;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "#c0c0c0" }}>
+    <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, background: "#c0c0c0" }}>
       {/* Toolbar */}
       <div
         style={{
