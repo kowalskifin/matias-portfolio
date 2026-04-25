@@ -6,9 +6,9 @@ interface MinesweeperProps {
   onOpenContact: () => void;
 }
 
-const ROWS = 9;
-const COLS = 9;
-const MINES = 10;
+const ROWS = 6;
+const COLS = 6;
+const MINES = 6;
 
 type Cell = {
   isMine: boolean;
@@ -41,7 +41,6 @@ function placeMines(board: Cell[][], firstR: number, firstC: number): Cell[][] {
     next[r][c].isMine = true;
     placed++;
   }
-  // Calculate adjacency
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (next[r][c].isMine) continue;
@@ -50,9 +49,7 @@ function placeMines(board: Cell[][], firstR: number, firstC: number): Cell[][] {
         for (let dc = -1; dc <= 1; dc++) {
           const nr = r + dr;
           const nc = c + dc;
-          if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && next[nr][nc].isMine) {
-            count++;
-          }
+          if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && next[nr][nc].isMine) count++;
         }
       }
       next[r][c].adj = count;
@@ -82,14 +79,8 @@ function floodReveal(board: Cell[][], r: number, c: number): Cell[][] {
 }
 
 const ADJ_COLORS: Record<number, string> = {
-  1: "#0000ff",
-  2: "#008000",
-  3: "#ff0000",
-  4: "#000080",
-  5: "#800000",
-  6: "#008080",
-  7: "#800080",
-  8: "#808080",
+  1: "#0000ff", 2: "#008000", 3: "#ff0000", 4: "#000080",
+  5: "#800000", 6: "#008080", 7: "#800080", 8: "#808080",
 };
 
 export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
@@ -98,19 +89,15 @@ export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
   const [flagCount, setFlagCount] = useState(0);
   const [time, setTime] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const minesLeft = MINES - flagCount;
-
-  const startTimer = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => setTime((t) => t + 1), 1000);
-  }, []);
 
   const stopTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
   }, []);
+
+  const startTimer = useCallback(() => {
+    stopTimer();
+    timerRef.current = setInterval(() => setTime((t) => t + 1), 1000);
+  }, [stopTimer]);
 
   useEffect(() => () => stopTimer(), [stopTimer]);
 
@@ -123,11 +110,9 @@ export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
   };
 
   const checkWin = (b: Cell[][]) => {
-    for (let r = 0; r < ROWS; r++) {
-      for (let c = 0; c < COLS; c++) {
+    for (let r = 0; r < ROWS; r++)
+      for (let c = 0; c < COLS; c++)
         if (!b[r][c].isMine && !b[r][c].isRevealed) return false;
-      }
-    }
     return true;
   };
 
@@ -136,17 +121,15 @@ export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
     const cell = board[r][c];
     if (cell.isRevealed || cell.isFlagged) return;
 
-    let currentBoard = board;
-
+    let current = board;
     if (gameState === "idle") {
-      currentBoard = placeMines(board, r, c);
+      current = placeMines(board, r, c);
       setGameState("playing");
       startTimer();
     }
 
-    if (currentBoard[r][c].isMine) {
-      // Reveal all mines
-      const revealed = currentBoard.map((row) =>
+    if (current[r][c].isMine) {
+      const revealed = current.map((row) =>
         row.map((cell) => (cell.isMine ? { ...cell, isRevealed: true } : { ...cell }))
       );
       setBoard(revealed);
@@ -155,21 +138,15 @@ export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
       return;
     }
 
-    const next = floodReveal(currentBoard, r, c);
+    const next = floodReveal(current, r, c);
     setBoard(next);
-
-    if (checkWin(next)) {
-      setGameState("won");
-      stopTimer();
-    }
+    if (checkWin(next)) { setGameState("won"); stopTimer(); }
   };
 
   const handleRightClick = (e: React.MouseEvent, r: number, c: number) => {
     e.preventDefault();
     if (gameState === "won" || gameState === "lost") return;
-    const cell = board[r][c];
-    if (cell.isRevealed) return;
-
+    if (board[r][c].isRevealed) return;
     const next = board.map((row) => row.map((c) => ({ ...c })));
     next[r][c].isFlagged = !next[r][c].isFlagged;
     setBoard(next);
@@ -177,50 +154,16 @@ export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
   };
 
   const smiley = gameState === "won" ? "😎" : gameState === "lost" ? "😵" : "🙂";
+  const minesLeft = MINES - flagCount;
 
   return (
-    <div
-      style={{
-        background: "#c0c0c0",
-        padding: 8,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        gap: 6,
-        userSelect: "none",
-      }}
-    >
+    <div style={{ background: "#c0c0c0", padding: 8, height: "100%", display: "flex", flexDirection: "column", gap: 6, userSelect: "none" }}>
       {/* Info bar */}
-      <div
-        style={{
-          background: "#c0c0c0",
-          border: "2px solid #808080",
-          borderRight: "2px solid #fff",
-          borderBottom: "2px solid #fff",
-          padding: "4px 8px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+      <div style={{ background: "#c0c0c0", border: "2px solid #808080", borderRight: "2px solid #fff", borderBottom: "2px solid #fff", padding: "4px 8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <SevenSeg value={Math.max(0, minesLeft)} />
         <button
-          style={{
-            background: "#c0c0c0",
-            border: "2px solid #fff",
-            borderRight: "2px solid #808080",
-            borderBottom: "2px solid #808080",
-            cursor: "pointer",
-            fontSize: 16,
-            width: 28,
-            height: 26,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 0,
-          }}
+          style={{ background: "#c0c0c0", border: "2px solid #fff", borderRight: "2px solid #808080", borderBottom: "2px solid #808080", cursor: "pointer", fontSize: 16, width: 28, height: 26, display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
           onClick={reset}
-          title="New game"
         >
           {smiley}
         </button>
@@ -228,16 +171,7 @@ export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
       </div>
 
       {/* Grid */}
-      <div
-        style={{
-          border: "2px solid #808080",
-          borderRight: "2px solid #fff",
-          borderBottom: "2px solid #fff",
-          display: "inline-flex",
-          flexDirection: "column",
-          alignSelf: "center",
-        }}
-      >
+      <div style={{ border: "2px solid #808080", borderRight: "2px solid #fff", borderBottom: "2px solid #fff", display: "inline-flex", flexDirection: "column", alignSelf: "center" }}>
         {board.map((row, r) => (
           <div key={r} style={{ display: "flex" }}>
             {row.map((cell, c) => (
@@ -253,61 +187,35 @@ export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
         ))}
       </div>
 
-      {/* Win/lose overlay */}
+      {/* Win/lose */}
       {(gameState === "won" || gameState === "lost") && (
-        <div
-          style={{
-            background: "#c0c0c0",
-            border: "2px solid #fff",
-            borderRight: "2px solid #808080",
-            borderBottom: "2px solid #808080",
-            padding: "10px 12px",
-            textAlign: "center",
-            fontSize: 11,
-          }}
-        >
+        <div style={{ background: "#c0c0c0", border: "2px solid #fff", borderRight: "2px solid #808080", borderBottom: "2px solid #808080", padding: "10px 12px", textAlign: "center", fontSize: 11 }}>
           {gameState === "won" ? (
             <>
               <div style={{ fontSize: 18, marginBottom: 4 }}>🎉 WINNER</div>
               <p style={{ margin: "0 0 8px", lineHeight: 1.5 }}>
-                You just completed a task with unclear requirements,
-                <br />
-                hidden information, and significant consequences for wrong clicks.
-                <br />
-                <br />
-                Sounds like product management.
-                <br />
-                I&apos;ve been doing it for 6 years.
-                <br />
+                You just completed a task with unclear requirements,<br />
+                hidden information, and significant consequences for wrong clicks.<br /><br />
+                Sounds like product management.<br />
+                I&apos;ve been doing it for 6 years.<br />
                 Let&apos;s talk.
               </p>
               <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-                <button className="win98-btn" onClick={reset}>
-                  Close
-                </button>
-                <button className="win98-btn" onClick={onOpenContact}>
-                  Open contact →
-                </button>
+                <button className="win98-btn" onClick={reset}>Close</button>
+                <button className="win98-btn" onClick={onOpenContact}>Open contact →</button>
               </div>
             </>
           ) : (
             <>
               <div style={{ fontSize: 18, marginBottom: 4 }}>💥 GAME OVER</div>
               <p style={{ margin: "0 0 8px", lineHeight: 1.5 }}>
-                You clicked a mine.
-                <br />
-                <br />
-                This happens in product too.
-                <br />
+                You clicked a mine.<br /><br />
+                This happens in product too.<br />
                 The difference is what you do next.
               </p>
               <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-                <button className="win98-btn" onClick={reset}>
-                  Try again
-                </button>
-                <button className="win98-btn" onClick={reset}>
-                  Close
-                </button>
+                <button className="win98-btn" onClick={reset}>Try again</button>
+                <button className="win98-btn" onClick={reset}>Close</button>
               </div>
             </>
           )}
@@ -318,84 +226,25 @@ export default function Minesweeper({ onOpenContact }: MinesweeperProps) {
 }
 
 function SevenSeg({ value }: { value: number }) {
-  const str = String(value).padStart(3, "0");
   return (
-    <div
-      style={{
-        background: "#200000",
-        color: "#ff0000",
-        fontFamily: "Courier New, monospace",
-        fontWeight: "bold",
-        fontSize: 18,
-        padding: "2px 6px",
-        letterSpacing: 2,
-        minWidth: 40,
-        textAlign: "center",
-        border: "2px solid #808080",
-        borderRight: "2px solid #fff",
-        borderBottom: "2px solid #fff",
-      }}
-    >
-      {str}
+    <div style={{ background: "#200000", color: "#ff0000", fontFamily: "Courier New, monospace", fontWeight: "bold", fontSize: 18, padding: "2px 6px", letterSpacing: 2, minWidth: 40, textAlign: "center", border: "2px solid #808080", borderRight: "2px solid #fff", borderBottom: "2px solid #fff" }}>
+      {String(value).padStart(3, "0")}
     </div>
   );
 }
 
-function CellButton({
-  cell,
-  gameState,
-  onClick,
-  onRightClick,
-}: {
-  cell: Cell;
-  gameState: GameState;
-  onClick: () => void;
-  onRightClick: (e: React.MouseEvent) => void;
-}) {
-  const size = 20;
-
+function CellButton({ cell, gameState, onClick, onRightClick }: { cell: Cell; gameState: GameState; onClick: () => void; onRightClick: (e: React.MouseEvent) => void; }) {
+  const size = 24;
   if (cell.isRevealed) {
     return (
-      <div
-        style={{
-          width: size,
-          height: size,
-          border: "1px solid #808080",
-          background: cell.isMine ? "#ff0000" : "#c0c0c0",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 11,
-          fontWeight: "bold",
-          color: cell.isMine ? "#000" : ADJ_COLORS[cell.adj] ?? "transparent",
-          cursor: "default",
-        }}
-      >
+      <div style={{ width: size, height: size, border: "1px solid #808080", background: cell.isMine ? "#ff0000" : "#c0c0c0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: "bold", color: cell.isMine ? "#000" : ADJ_COLORS[cell.adj] ?? "transparent", cursor: "default" }}>
         {cell.isMine ? "💣" : cell.adj > 0 ? cell.adj : ""}
       </div>
     );
   }
-
   return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        background: "#c0c0c0",
-        borderTop: "2px solid #fff",
-        borderLeft: "2px solid #fff",
-        borderRight: "2px solid #808080",
-        borderBottom: "2px solid #808080",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 12,
-        cursor:
-          gameState === "won" || gameState === "lost" ? "default" : "pointer",
-      }}
-      onClick={onClick}
-      onContextMenu={onRightClick}
-    >
+    <div style={{ width: size, height: size, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #808080", borderBottom: "2px solid #808080", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, cursor: gameState === "won" || gameState === "lost" ? "default" : "pointer" }}
+      onClick={onClick} onContextMenu={onRightClick}>
       {cell.isFlagged ? "🚩" : ""}
     </div>
   );
