@@ -1,65 +1,119 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import Boot from "@/components/Boot";
+import Desktop from "@/components/Desktop";
+
+type Phase = "boot" | "desktop" | "shutdown";
 
 export default function Home() {
+  const [phase, setPhase] = useState<Phase>("boot");
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <>
+      {/* Mobile error — shown only on small screens via CSS */}
+      <div
+        className="mobile-error"
+        style={{
+          display: "none",
+          position: "fixed",
+          inset: 0,
+          background: "#c0c0c0",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 99999,
+        }}
+      >
+        <div
+          style={{
+            background: "#c0c0c0",
+            borderTop: "2px solid #fff",
+            borderLeft: "2px solid #fff",
+            borderRight: "2px solid #808080",
+            borderBottom: "2px solid #808080",
+            maxWidth: "340px",
+            width: "90%",
+          }}
+        >
+          <div
+            style={{
+              background: "linear-gradient(to right, #aa0000, #cc2020)",
+              color: "white",
+              fontWeight: "bold",
+              fontSize: 11,
+              padding: "3px 6px",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <span
+              style={{
+                background: "#fff",
+                color: "#aa0000",
+                borderRadius: "50%",
+                width: 14,
+                height: 14,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "bold",
+                fontSize: 10,
+                flexShrink: 0,
+              }}
+            >
+              !
+            </span>
+            FATAL ERROR
+          </div>
+          <div style={{ padding: "16px 16px 12px", fontSize: 12 }}>
+            <p style={{ fontWeight: "bold", marginBottom: 8 }}>
+              This application requires a minimum screen width of 1024px to run.
+            </p>
+            <p style={{ marginBottom: 8 }}>
+              Mobile devices were not supported in 1998. They are not supported
+              here.
+            </p>
+            <p style={{ marginBottom: 12 }}>
+              Please return on a real computer.
+            </p>
+            <p
+              style={{
+                fontFamily: "Courier New, monospace",
+                fontSize: 10,
+                marginBottom: 16,
+                color: "#444",
+              }}
+            >
+              Error code: 0x00MOBILE
+            </p>
+            <div style={{ textAlign: "center", marginBottom: 8 }}>
+              <button className="win98-btn">OK</button>
+            </div>
+            <p style={{ textAlign: "center", fontSize: 10, color: "#666" }}>
+              or just email me:{" "}
+              <a
+                href="mailto:matias.korpisalo@outlook.com"
+                style={{ color: "#000080" }}
+              >
+                matias.korpisalo@outlook.com
+              </a>
+            </p>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+
+      {/* Desktop-only content */}
+      <div className="desktop-only" style={{ height: "100%" }}>
+        {phase === "boot" || phase === "shutdown" ? (
+          <Boot
+            onComplete={() => setPhase("desktop")}
+            isReboot={phase === "shutdown"}
+          />
+        ) : (
+          <Desktop onReboot={() => setPhase("shutdown")} />
+        )}
+      </div>
+    </>
   );
 }
