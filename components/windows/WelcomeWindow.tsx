@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 interface WelcomeWindowProps {
-  onClose: () => void;
   onOpenCV: () => void;
   onOpenCases: () => void;
   onOpenThoughts: () => void;
@@ -144,17 +143,8 @@ function PanelContact({ onOpenContact }: { onOpenContact: () => void }) {
   );
 }
 
-export default function WelcomeWindow({ onClose, onOpenCV, onOpenCases, onOpenThoughts, onOpenContact }: WelcomeWindowProps) {
+export default function WelcomeWindow({ onOpenCV, onOpenCases, onOpenThoughts, onOpenContact }: WelcomeWindowProps) {
   const [activeNav, setActiveNav] = useState("who");
-  const [showWelcome, setShowWelcome] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return localStorage.getItem("portfolio_show_welcome") !== "false";
-  });
-
-  const handleCheckbox = (checked: boolean) => {
-    setShowWelcome(checked);
-    localStorage.setItem("portfolio_show_welcome", checked ? "true" : "false");
-  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "#c0c0c0" }}>
@@ -258,42 +248,6 @@ export default function WelcomeWindow({ onClose, onOpenCV, onOpenCases, onOpenTh
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div style={{
-        background: "#c0c0c0",
-        borderTop: "1px solid #808080",
-        padding: "8px 10px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        flexShrink: 0,
-      }}>
-        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, cursor: "pointer", userSelect: "none" }}>
-          <input
-            type="checkbox"
-            checked={showWelcome}
-            onChange={(e) => handleCheckbox(e.target.checked)}
-            style={{ cursor: "pointer" }}
-          />
-          Show this screen each time Portfolio OS starts
-        </label>
-        <button
-          onClick={onClose}
-          style={{
-            background: "#c0c0c0",
-            borderTop: "1px solid #fff",
-            borderLeft: "1px solid #fff",
-            borderRight: "1px solid #404040",
-            borderBottom: "1px solid #404040",
-            padding: "4px 14px",
-            font: "11px Arial",
-            cursor: "pointer",
-            minWidth: 60,
-          }}
-        >
-          Close
-        </button>
-      </div>
     </div>
   );
 }
