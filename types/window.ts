@@ -2,6 +2,7 @@ export type WindowId =
   | "cv"
   | "cases"
   | "case-alicent"
+  | "case-noted"
   | "thoughts"
   | "uses"
   | "contact"
@@ -27,6 +28,7 @@ export const INITIAL_POSITIONS: Record<WindowId, { x: number; y: number }> = {
   cv:             { x: 88,  y: 24  },
   cases:          { x: 160, y: 55  },
   "case-alicent": { x: 120, y: 35  },
+  "case-noted":   { x: 130, y: 45  },
   thoughts:       { x: 220, y: 115 },
   uses:           { x: 95,  y: 185 },
   contact:        { x: 175, y: 145 },
@@ -45,6 +47,7 @@ export const WINDOW_TITLES: Record<WindowId, string> = {
   cv:             "📄 cv.doc — WordPad",
   cases:          "📁 case_studies — File Manager",
   "case-alicent": "📄 case_01_zero_to_one.txt — Notepad",
+  "case-noted":   "📄 noted_case_study.txt — Notepad",
   thoughts:       "📝 thoughts.txt — Notepad",
   uses:           "💻 uses.exe",
   contact:        "✉️ contact — Outlook Express",

@@ -12,6 +12,7 @@ import CVWindow from "@/components/windows/CVWindow";
 import CVViewerWindow from "@/components/windows/CVViewerWindow";
 import CaseStudiesWindow from "@/components/windows/CaseStudiesWindow";
 import CaseStudy01Window from "@/components/windows/CaseStudy01Window";
+import CaseStudyNotedWindow from "@/components/windows/CaseStudyNotedWindow";
 import ThoughtsWindow from "@/components/windows/ThoughtsWindow";
 import UsesWindow from "@/components/windows/UsesWindow";
 import ContactWindow from "@/components/windows/ContactWindow";
@@ -28,7 +29,7 @@ interface DesktopProps {
 
 function buildInitialState(): Record<WindowId, WindowState> {
   const ids: WindowId[] = [
-    "cv", "cases", "case-alicent", "thoughts", "uses", "contact",
+    "cv", "cases", "case-alicent", "case-noted", "thoughts", "uses", "contact",
     "recycle", "cvpdf", "cvviewer", "minesweeper", "shutdown", "about",
     "display-props", "clock", "readme",
   ];
@@ -176,6 +177,7 @@ const WINDOW_SIZES: Record<string, { w: number; h: number }> = {
   cv:             { w: 550, h: 480 },
   cases:          { w: 520, h: 380 },
   "case-alicent": { w: 520, h: 420 },
+  "case-noted":   { w: 540, h: 460 },
   thoughts:       { w: 420, h: 320 },
   uses:           { w: 380, h: 300 },
   contact:        { w: 380, h: 280 },
@@ -406,8 +408,11 @@ export default function Desktop({ onReboot }: DesktopProps) {
         )}
 
         {windows.cases.isOpen && !windows.cases.isMinimized && (
-          <Window {...makeWindowProps("cases")} statusLeft="3 objects">
-            <CaseStudiesWindow onOpenCase={(id) => { if (id === "case-alicent") openWindow("case-alicent"); }} />
+          <Window {...makeWindowProps("cases")} statusLeft="5 objects">
+            <CaseStudiesWindow onOpenCase={(id) => {
+              if (id === "case-alicent") openWindow("case-alicent");
+              else if (id === "case-noted") openWindow("case-noted");
+            }} />
           </Window>
         )}
 
@@ -421,6 +426,22 @@ export default function Desktop({ onReboot }: DesktopProps) {
             statusLeft="Ready"
           >
             <CaseStudy01Window />
+          </Window>
+        )}
+
+        {windows["case-noted"].isOpen && !windows["case-noted"].isMinimized && (
+          <Window
+            {...makeWindowProps("case-noted")}
+            menuItems={[
+              { label: "File", items: [{ label: "Exit", onClick: () => closeWindow("case-noted") }] },
+              { label: "Edit", items: [] },
+              { label: "Help", items: [] },
+            ]}
+            statusLeft="noted_case_study.txt"
+            statusRight="Ready"
+            noScroll
+          >
+            <CaseStudyNotedWindow />
           </Window>
         )}
 
