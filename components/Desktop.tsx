@@ -218,41 +218,28 @@ export default function Desktop({ onReboot }: DesktopProps) {
     typeof window !== "undefined" && localStorage.getItem("portfolio_visited") !== "true"
   )[0];
   const cvWasOpenRef = useRef(false);
-  const welcomeWasOpenRef = useRef(false);
-  const alertScheduledRef = useRef(false);
   const cvNudgeShownRef = useRef(false);
   const casesOpenedRef = useRef(false);
   const windowsOpenedCountRef = useRef(0);
 
-  // On mount: open welcome after 600ms for both first and return visits (subject to checkbox)
+  // On mount: open welcome immediately (permanent fixture on desktop)
   useEffect(() => {
     localStorage.setItem("portfolio_visited", "true");
-    const shouldShow = localStorage.getItem("portfolio_show_welcome") !== "false";
-    if (!shouldShow) return;
-    const t = setTimeout(() => {
-      const x = Math.max(0, Math.round((window.innerWidth - 520) / 2));
-      const y = Math.max(0, Math.round((window.innerHeight - 28 - 400) / 2));
-      setMaxZ((z) => z + 1);
-      setWindows((prev) => ({
-        ...prev,
-        welcome: { ...prev.welcome, isOpen: true, isMinimized: false, position: { x, y }, zIndex: 50 },
-      }));
-    }, 600);
-    return () => clearTimeout(t);
+    const x = Math.max(0, Math.round((window.innerWidth - 520) / 2));
+    const y = Math.max(0, Math.round((window.innerHeight - 28 - 400) / 2));
+    setWindows((prev) => ({
+      ...prev,
+      welcome: { ...prev.welcome, isOpen: true, isMinimized: false, position: { x, y }, zIndex: 10 },
+    }));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // First visit: show alert 800ms after welcome is closed
+  // First visit: show alert at 1200ms
   useEffect(() => {
     if (!isFirstVisit) return;
-    if (windows.welcome.isOpen) {
-      welcomeWasOpenRef.current = true;
-    } else if (welcomeWasOpenRef.current && !alertScheduledRef.current) {
-      alertScheduledRef.current = true;
-      const t = setTimeout(() => setAlertVisible(true), 800);
-      return () => clearTimeout(t);
-    }
-  }, [isFirstVisit, windows.welcome.isOpen]);
+    const t = setTimeout(() => setAlertVisible(true), 1200);
+    return () => clearTimeout(t);
+  }, [isFirstVisit]);
 
   // Post-cv nudge: show tooltip after cv closes if case_studies not yet opened
   useEffect(() => {
@@ -260,12 +247,7 @@ export default function Desktop({ onReboot }: DesktopProps) {
       cvWasOpenRef.current = true;
       return;
     }
-    if (
-      cvWasOpenRef.current &&
-      !cvNudgeShownRef.current &&
-      !casesOpenedRef.current &&
-      !windows.welcome.isOpen
-    ) {
+    if (cvWasOpenRef.current && !cvNudgeShownRef.current && !casesOpenedRef.current) {
       cvNudgeShownRef.current = true;
       const t = setTimeout(() => {
         setCvNudgeVisible(true);
@@ -273,7 +255,7 @@ export default function Desktop({ onReboot }: DesktopProps) {
       }, 800);
       return () => clearTimeout(t);
     }
-  }, [windows.cv.isOpen, windows.welcome.isOpen]);
+  }, [windows.cv.isOpen]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -308,9 +290,6 @@ export default function Desktop({ onReboot }: DesktopProps) {
     setWindows((prev) => ({ ...prev, [id]: { ...prev[id], isOpen: true, isMinimized: false, zIndex: maxZ + 1 } }));
     if (id === "cases") casesOpenedRef.current = true;
     windowsOpenedCountRef.current += 1;
-    if (windowsOpenedCountRef.current >= 3) {
-      localStorage.setItem("portfolio_show_welcome", "false");
-    }
   }, [maxZ]);
 
   const closeWindow = useCallback((id: WindowId) => {
@@ -608,17 +587,17 @@ export default function Desktop({ onReboot }: DesktopProps) {
             zIndex={windows.welcome.zIndex}
             width={520}
             height={400}
-            onClose={() => closeWindow("welcome")}
+            onClose={() => {}}
             onFocus={() => focus("welcome")}
             onMove={(pos) => moveWindow("welcome", pos)}
             noScroll
+            noClose
           >
             <WelcomeWindow
-              onClose={() => closeWindow("welcome")}
-              onOpenCV={() => { openWindow("cv"); closeWindow("welcome"); }}
-              onOpenCases={() => { openWindow("cases"); closeWindow("welcome"); }}
-              onOpenThoughts={() => { openWindow("thoughts"); closeWindow("welcome"); }}
-              onOpenContact={() => { openWindow("contact"); closeWindow("welcome"); }}
+              onOpenCV={() => openWindow("cv")}
+              onOpenCases={() => openWindow("cases")}
+              onOpenThoughts={() => openWindow("thoughts")}
+              onOpenContact={() => openWindow("contact")}
             />
           </Window>
         )}

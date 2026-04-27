@@ -23,6 +23,7 @@ interface WindowProps {
   statusLeft?: string;
   statusRight?: string;
   noScroll?: boolean;
+  noClose?: boolean;
 }
 
 const TASKBAR_HEIGHT = 28;
@@ -42,6 +43,7 @@ export default function Window({
   statusLeft,
   statusRight,
   noScroll,
+  noClose,
 }: WindowProps) {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const windowRef = useRef<HTMLDivElement>(null);
@@ -121,13 +123,15 @@ export default function Window({
               <span style={{ fontSize: 8, lineHeight: 1, paddingBottom: 2 }}>_</span>
             </div>
           )}
-          <div
-            className="win98-titlebar-btn"
-            onClick={(e) => { e.stopPropagation(); onClose(); }}
-            title="Close"
-          >
-            <span style={{ fontSize: 9, lineHeight: 1, fontWeight: "bold" }}>✕</span>
-          </div>
+          {!noClose && (
+            <div
+              className="win98-titlebar-btn"
+              onClick={(e) => { e.stopPropagation(); onClose(); }}
+              title="Close"
+            >
+              <span style={{ fontSize: 9, lineHeight: 1, fontWeight: "bold" }}>✕</span>
+            </div>
+          )}
         </div>
       </div>
 
