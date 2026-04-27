@@ -48,7 +48,7 @@ export const INITIAL_POSITIONS: Record<WindowId, { x: number; y: number }> = {
 export const WINDOW_TITLES: Record<WindowId, string> = {
   welcome:        "🪟 Welcome to Portfolio OS 1.0",
   cv:             "📄 cv.doc — WordPad",
-  cases:          "📁 case_studies — File Manager",
+  cases:          "🌐 case_studies — Internet Explorer",
   "case-alicent": "📄 case_01_zero_to_one.txt — Notepad",
   "case-noted":   "📄 noted_case_study.txt — Notepad",
   thoughts:       "📝 thoughts.txt — Notepad",
