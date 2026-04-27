@@ -14,7 +14,8 @@ export type WindowId =
   | "about"
   | "display-props"
   | "clock"
-  | "readme";
+  | "readme"
+  | "welcome";
 
 export type WindowState = {
   id: WindowId;
@@ -25,6 +26,7 @@ export type WindowState = {
 };
 
 export const INITIAL_POSITIONS: Record<WindowId, { x: number; y: number }> = {
+  welcome:        { x: 460, y: 200 },
   cv:             { x: 88,  y: 24  },
   cases:          { x: 160, y: 55  },
   "case-alicent": { x: 120, y: 35  },
@@ -44,6 +46,7 @@ export const INITIAL_POSITIONS: Record<WindowId, { x: number; y: number }> = {
 };
 
 export const WINDOW_TITLES: Record<WindowId, string> = {
+  welcome:        "🪟 Welcome to Portfolio OS 1.0",
   cv:             "📄 cv.doc — WordPad",
   cases:          "📁 case_studies — File Manager",
   "case-alicent": "📄 case_01_zero_to_one.txt — Notepad",

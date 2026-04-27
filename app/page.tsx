@@ -7,7 +7,12 @@ import Desktop from "@/components/Desktop";
 type Phase = "boot" | "desktop" | "shutdown";
 
 export default function Home() {
-  const [phase, setPhase] = useState<Phase>("boot");
+  const [phase, setPhase] = useState<Phase>(() => {
+    if (typeof window !== "undefined" && localStorage.getItem("portfolio_visited") === "true") {
+      return "desktop";
+    }
+    return "boot";
+  });
 
   return (
     <>
