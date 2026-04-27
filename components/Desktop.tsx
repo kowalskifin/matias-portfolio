@@ -22,6 +22,7 @@ import CVPDFDialog from "@/components/windows/CVPDFDialog";
 import ShutDownDialog from "@/components/windows/ShutDownDialog";
 import AboutDialog from "@/components/windows/AboutDialog";
 import ReadmeWindow from "@/components/windows/ReadmeWindow";
+import WelcomeWindow from "@/components/windows/WelcomeWindow";
 
 interface DesktopProps {
   onReboot: () => void;
@@ -31,7 +32,7 @@ function buildInitialState(): Record<WindowId, WindowState> {
   const ids: WindowId[] = [
     "cv", "cases", "case-alicent", "case-noted", "thoughts", "uses", "contact",
     "recycle", "cvpdf", "cvviewer", "minesweeper", "shutdown", "about",
-    "display-props", "clock", "readme",
+    "display-props", "clock", "readme", "welcome",
   ];
   return Object.fromEntries(
     ids.map((id) => [id, { id, isOpen: false, isMinimized: false, position: INITIAL_POSITIONS[id], zIndex: 10 }])
@@ -190,6 +191,7 @@ const WINDOW_SIZES: Record<string, { w: number; h: number }> = {
   "display-props":{ w: 300, h: 240 },
   clock:          { w: 260, h: 180 },
   readme:         { w: 380, h: 300 },
+  welcome:        { w: 520, h: 400 },
 };
 
 const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
@@ -209,11 +211,69 @@ export default function Desktop({ onReboot }: DesktopProps) {
   const [overthinkerDone, setOverthinkerDone] = useState(false);
   const [selectedIconId, setSelectedIconId] = useState<string | null>(null);
   const [showMediaPlayer, setShowMediaPlayer] = useState(false);
+  const [cvNudgeVisible, setCvNudgeVisible] = useState(false);
 
+  // Detect first vs return visit synchronously before any effects run
+  const isFirstVisit = useState(() =>
+    typeof window !== "undefined" && localStorage.getItem("portfolio_visited") !== "true"
+  )[0];
+  const cvWasOpenRef = useRef(false);
+  const welcomeWasOpenRef = useRef(false);
+  const alertScheduledRef = useRef(false);
+  const cvNudgeShownRef = useRef(false);
+  const casesOpenedRef = useRef(false);
+  const windowsOpenedCountRef = useRef(0);
+
+  // On mount: open welcome after 600ms for both first and return visits (subject to checkbox)
   useEffect(() => {
-    const t = setTimeout(() => setAlertVisible(true), 1200);
+    localStorage.setItem("portfolio_visited", "true");
+    const shouldShow = localStorage.getItem("portfolio_show_welcome") !== "false";
+    if (!shouldShow) return;
+    const t = setTimeout(() => {
+      const x = Math.max(0, Math.round((window.innerWidth - 520) / 2));
+      const y = Math.max(0, Math.round((window.innerHeight - 28 - 400) / 2));
+      setMaxZ((z) => z + 1);
+      setWindows((prev) => ({
+        ...prev,
+        welcome: { ...prev.welcome, isOpen: true, isMinimized: false, position: { x, y }, zIndex: 50 },
+      }));
+    }, 600);
     return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // First visit: show alert 800ms after welcome is closed
+  useEffect(() => {
+    if (!isFirstVisit) return;
+    if (windows.welcome.isOpen) {
+      welcomeWasOpenRef.current = true;
+    } else if (welcomeWasOpenRef.current && !alertScheduledRef.current) {
+      alertScheduledRef.current = true;
+      const t = setTimeout(() => setAlertVisible(true), 800);
+      return () => clearTimeout(t);
+    }
+  }, [isFirstVisit, windows.welcome.isOpen]);
+
+  // Post-cv nudge: show tooltip after cv closes if case_studies not yet opened
+  useEffect(() => {
+    if (windows.cv.isOpen) {
+      cvWasOpenRef.current = true;
+      return;
+    }
+    if (
+      cvWasOpenRef.current &&
+      !cvNudgeShownRef.current &&
+      !casesOpenedRef.current &&
+      !windows.welcome.isOpen
+    ) {
+      cvNudgeShownRef.current = true;
+      const t = setTimeout(() => {
+        setCvNudgeVisible(true);
+        setTimeout(() => setCvNudgeVisible(false), 6000);
+      }, 800);
+      return () => clearTimeout(t);
+    }
+  }, [windows.cv.isOpen, windows.welcome.isOpen]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -246,6 +306,11 @@ export default function Desktop({ onReboot }: DesktopProps) {
     setMaxZ((z) => z + 1);
     setSelectedIconId(null);
     setWindows((prev) => ({ ...prev, [id]: { ...prev[id], isOpen: true, isMinimized: false, zIndex: maxZ + 1 } }));
+    if (id === "cases") casesOpenedRef.current = true;
+    windowsOpenedCountRef.current += 1;
+    if (windowsOpenedCountRef.current >= 3) {
+      localStorage.setItem("portfolio_show_welcome", "false");
+    }
   }, [maxZ]);
 
   const closeWindow = useCallback((id: WindowId) => {
@@ -535,6 +600,29 @@ export default function Desktop({ onReboot }: DesktopProps) {
           </Window>
         )}
 
+        {windows.welcome.isOpen && !windows.welcome.isMinimized && (
+          <Window
+            id="welcome"
+            title={WINDOW_TITLES.welcome}
+            position={windows.welcome.position}
+            zIndex={windows.welcome.zIndex}
+            width={520}
+            height={400}
+            onClose={() => closeWindow("welcome")}
+            onFocus={() => focus("welcome")}
+            onMove={(pos) => moveWindow("welcome", pos)}
+            noScroll
+          >
+            <WelcomeWindow
+              onClose={() => closeWindow("welcome")}
+              onOpenCV={() => { openWindow("cv"); closeWindow("welcome"); }}
+              onOpenCases={() => { openWindow("cases"); closeWindow("welcome"); }}
+              onOpenThoughts={() => { openWindow("thoughts"); closeWindow("welcome"); }}
+              onOpenContact={() => { openWindow("contact"); closeWindow("welcome"); }}
+            />
+          </Window>
+        )}
+
         {/* Media player fake dialog */}
         {showMediaPlayer && (
           <Window
@@ -568,6 +656,52 @@ export default function Desktop({ onReboot }: DesktopProps) {
           </SimpleDialog>
         )}
       </div>
+
+      {/* Post-cv nudge balloon */}
+      {cvNudgeVisible && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 36,
+            right: 16,
+            zIndex: maxZ + 300,
+            background: "#ffffcc",
+            borderTop: "1px solid #808080",
+            borderLeft: "1px solid #808080",
+            borderRight: "1px solid #404040",
+            borderBottom: "1px solid #404040",
+            padding: "8px 10px 8px 10px",
+            fontSize: 11,
+            fontFamily: "Arial, sans-serif",
+            boxShadow: "2px 2px 0 rgba(0,0,0,0.3)",
+            maxWidth: 260,
+            lineHeight: 1.5,
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+            <div>
+              <span style={{ marginRight: 4 }}>💡</span>
+              <strong>case_studies</strong> has the full work breakdown.<br />
+              Double-click it on the desktop.
+            </div>
+            <button
+              onClick={() => setCvNudgeVisible(false)}
+              style={{
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                fontSize: 10,
+                lineHeight: 1,
+                padding: "0 2px",
+                color: "#333",
+                flexShrink: 0,
+              }}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Alert popup */}
       {alertVisible && !alertDismissed && (
