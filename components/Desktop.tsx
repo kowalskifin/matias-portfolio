@@ -10,7 +10,7 @@ import AlertPopup from "@/components/AlertPopup";
 import ContextMenu from "@/components/ContextMenu";
 import CVWindow from "@/components/windows/CVWindow";
 import CVViewerWindow from "@/components/windows/CVViewerWindow";
-import CaseStudiesWindow from "@/components/windows/CaseStudiesWindow";
+import CaseStudiesBrowserWindow from "@/components/windows/CaseStudiesBrowserWindow";
 import CaseStudy01Window from "@/components/windows/CaseStudy01Window";
 import CaseStudyNotedWindow from "@/components/windows/CaseStudyNotedWindow";
 import ThoughtsWindow from "@/components/windows/ThoughtsWindow";
@@ -176,7 +176,7 @@ const RIGHT_ICONS = [
 
 const WINDOW_SIZES: Record<string, { w: number; h: number }> = {
   cv:             { w: 550, h: 480 },
-  cases:          { w: 520, h: 380 },
+  cases:          { w: 640, h: 520 },
   "case-alicent": { w: 520, h: 420 },
   "case-noted":   { w: 540, h: 460 },
   thoughts:       { w: 420, h: 320 },
@@ -212,6 +212,7 @@ export default function Desktop({ onReboot }: DesktopProps) {
   const [selectedIconId, setSelectedIconId] = useState<string | null>(null);
   const [showMediaPlayer, setShowMediaPlayer] = useState(false);
   const [cvNudgeVisible, setCvNudgeVisible] = useState(false);
+  const [casesBrowserTitle, setCasesBrowserTitle] = useState("🌐 case_studies — Internet Explorer");
 
   // Detect first vs return visit synchronously before any effects run
   const isFirstVisit = useState(() =>
@@ -452,11 +453,8 @@ export default function Desktop({ onReboot }: DesktopProps) {
         )}
 
         {windows.cases.isOpen && !windows.cases.isMinimized && (
-          <Window {...makeWindowProps("cases")} statusLeft="5 objects">
-            <CaseStudiesWindow onOpenCase={(id) => {
-              if (id === "case-alicent") openWindow("case-alicent");
-              else if (id === "case-noted") openWindow("case-noted");
-            }} />
+          <Window {...makeWindowProps("cases")} title={casesBrowserTitle} noScroll>
+            <CaseStudiesBrowserWindow onTitleChange={setCasesBrowserTitle} />
           </Window>
         )}
 
